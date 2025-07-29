@@ -15,7 +15,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        Label label = new Label("Test Git!");
+        Label label = new Label("Hello Sushi!");
         StackPane root = new StackPane(label);
         Scene scene = new Scene(root, 400, 200);
 
