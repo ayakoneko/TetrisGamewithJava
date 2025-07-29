@@ -15,12 +15,12 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        Label label = new Label("Hello Pizza!");
+        Label label = new Label("Test Git!");
         StackPane root = new StackPane(label);
         Scene scene = new Scene(root, 400, 200);
 
         primaryStage.setScene(scene);
-        primaryStage.setTitle("Maven Beer");
+        primaryStage.setTitle("Test Git");
         primaryStage.show();
     }
 }
