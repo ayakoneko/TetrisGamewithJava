@@ -20,7 +20,7 @@ public class Main extends Application {
         Scene scene = new Scene(root, 400, 200);
 
         primaryStage.setScene(scene);
-        primaryStage.setTitle("Maven Green Tea");
+        primaryStage.setTitle("Test Git");
         primaryStage.show();
     }
 }
