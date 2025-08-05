@@ -1,4 +1,3 @@
-
 package tetris.panel;
 
 import javafx.geometry.Insets;
