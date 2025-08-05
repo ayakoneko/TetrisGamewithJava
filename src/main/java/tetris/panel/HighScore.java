@@ -1,4 +1,4 @@
-package G11.panel;
+package tetris.panel;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -25,9 +25,9 @@ public class HighScore {
 
         // Array of dummy high score entries with Simpsons character names
         String[] dummyScores = {
-            "1. Homer - 1500", "2. Marge - 1400", "3. Bart - 1300", "4. Lisa - 1200",
-            "5. Maggie - 1100", "6. Ned Flanders - 1000", "7. Mr. Burns - 900", "8. Moe Szyslak - 800",
-            "9. Milhouse - 700", "10. Ralph Wiggum - 600"
+                "1. Homer - 1500", "2. Marge - 1400", "3. Bart - 1300", "4. Lisa - 1200",
+                "5. Maggie - 1100", "6. Ned Flanders - 1000", "7. Mr. Burns - 900", "8. Moe Szyslak - 800",
+                "9. Milhouse - 700", "10. Ralph Wiggum - 600"
         };
 
         // Add the title to the layout

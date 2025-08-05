@@ -1,7 +1,7 @@
-package G11;
+package tetris;
 
-import G11.panel.Configuration;
-import G11.panel.HighScore;
+import tetris.panel.Configuration;
+import tetris.panel.HighScore;
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.application.Platform;

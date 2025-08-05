@@ -1,4 +1,4 @@
-package G11.panel;
+package tetris.panel;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -48,9 +48,9 @@ public class Configuration {
         levelSlider.setSnapToTicks(true);
 
         slidersBox.getChildren().addAll(
-            widthLabel, widthSlider,
-            heightLabel, heightSlider,
-            levelLabel, levelSlider
+                widthLabel, widthSlider,
+                heightLabel, heightSlider,
+                levelLabel, levelSlider
         );
 
         // Checkbox 
