@@ -1,6 +1,9 @@
 package G11;
 
+import java.util.Optional;
+
 import G11.panel.Configuration;
+import G11.panel.HighScore;
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -18,8 +21,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
-
-import java.util.Optional;
 
 public class Main extends Application {
 
@@ -72,6 +73,11 @@ public class Main extends Application {
 
         Button button_highScore = new Button("High Score");
         button_highScore.setPrefWidth(200);
+        button_highScore.setOnAction(event -> {
+            primaryStage.hide(); // Hide main
+            HighScore highScore = new HighScore();
+            highScore.startHighScore(primaryStage);
+        });
 
         Button button_exit = new Button("Exit");
         button_exit.setPrefWidth(200);
