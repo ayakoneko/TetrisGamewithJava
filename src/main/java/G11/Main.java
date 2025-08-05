@@ -1,7 +1,5 @@
 package G11;
 
-import java.util.Optional;
-
 import G11.panel.Configuration;
 import G11.panel.HighScore;
 import javafx.animation.PauseTransition;
@@ -22,86 +20,124 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
+import java.util.Optional;
+
 public class Main extends Application {
+
+    // UI constants
+    private static final double BUTTON_WIDTH = 200;
+    private static final double MENU_PADDING = 100;
+    private static final double MENU_SPACING = 10;
+    private static final double SPLASH_IMAGE_WIDTH = 300;
+    private static final int SPLASH_DELAY_SECONDS = 3;
 
     @Override
     public void start(Stage primaryStage) {
-        // Splash Screen
-        Stage splashStage = new Stage(StageStyle.UNDECORATED);
-        ImageView splashImage = new ImageView(
-                new Image(getClass().getResource("/TetrisSplash.png").toExternalForm())
-        );
-        splashImage.setFitWidth(300);
-        splashImage.setFitHeight(300);
-        splashImage.setPreserveRatio(true);
-        splashImage.setSmooth(true);
+        showSplashScreen(primaryStage);
+    }
 
+    /**
+     * Displays the splash screen before showing the main menu.
+     */
+    private void showSplashScreen(Stage primaryStage) {
+        Stage splashStage = new Stage(StageStyle.UNDECORATED);
+
+        // Splash image
+        Image splashImage = new Image(getClass().getResource("/TetrisSplash.png").toExternalForm());
+        ImageView splashImageView = new ImageView(splashImage);
+        splashImageView.setPreserveRatio(true);
+        splashImageView.setFitWidth(SPLASH_IMAGE_WIDTH);
+        splashImageView.setSmooth(true);
+
+        // Loading text
         Label loadingLabel = new Label("Loading, please wait...");
 
-        StackPane splashLayout = new StackPane(splashImage, loadingLabel);
-        Scene splashScene = new Scene(splashLayout, 300, 300);
+        // Layout
+        VBox splashLayout = new VBox(splashImageView, loadingLabel);
+        splashLayout.setAlignment(Pos.CENTER);
+
+        Scene splashScene = new Scene(splashLayout);
         splashStage.setScene(splashScene);
+        splashStage.sizeToScene();
         splashStage.show();
 
-        // Delay before showing main stage
-        PauseTransition delay = new PauseTransition(Duration.seconds(3));
+        // Delay before main menu
+        PauseTransition delay = new PauseTransition(Duration.seconds(SPLASH_DELAY_SECONDS));
         delay.setOnFinished(event -> {
             splashStage.close();
-            showMainStage(primaryStage);
+            showMainMenu(primaryStage);
         });
         delay.play();
     }
 
-    public void showMainStage(Stage primaryStage) {
-        VBox menuOption = new VBox(10);
-        menuOption.setPadding(new Insets(100));
-        menuOption.setAlignment(Pos.CENTER);
+    /**
+     * Displays the main menu screen.
+     */
+    private void showMainMenu(Stage primaryStage) {
+        VBox menuLayout = new VBox(MENU_SPACING);
+        menuLayout.setPadding(new Insets(MENU_PADDING));
+        menuLayout.setAlignment(Pos.CENTER);
 
-        Label title = new Label("Main Page");
+        Label titleLabel = new Label("Main Page");
 
-        Button button_play = new Button("Play");
-        button_play.setPrefWidth(200);
+        // Buttons
+        Button playButton = createMenuButton("Play", () -> {
+            // TODO: Implement Play logic
+        });
 
-        Button button_config = new Button("Configuration");
-        button_config.setPrefWidth(200);
-
-        button_config.setOnAction(event -> {
+        Button configButton = createMenuButton("Configuration", () -> {
             primaryStage.hide();
-            Configuration config = new Configuration();
-            config.startConfig(primaryStage); // pass primaryStage so we can show it again later
+            new Configuration().startConfig(primaryStage);
         });
 
-        Button button_highScore = new Button("High Score");
-        button_highScore.setPrefWidth(200);
-        button_highScore.setOnAction(event -> {
-            primaryStage.hide(); // Hide main
-            HighScore highScore = new HighScore();
-            highScore.startHighScore(primaryStage);
+        Button highScoreButton = createMenuButton("High Score", () -> {
+            primaryStage.hide();
+            new HighScore().startHighScore(primaryStage);
         });
 
-        Button button_exit = new Button("Exit");
-        button_exit.setPrefWidth(200);
-        button_exit.setOnAction(e -> {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Exit Confirmation");
-            alert.setHeaderText(null);
-            alert.setContentText("Are you sure you want to exit the game?");
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.isPresent() && result.get() == ButtonType.OK) {
-                Platform.exit();
-            }
-        });
+        Button exitButton = createMenuButton("Exit", this::showExitConfirmation);
 
-        Label author = new Label("Author: G11");
+        Label authorLabel = new Label("Author: G11");
 
-        menuOption.getChildren().addAll(title, button_play, button_config, button_highScore, button_exit, author);
+        menuLayout.getChildren().addAll(
+                titleLabel,
+                playButton,
+                configButton,
+                highScoreButton,
+                exitButton,
+                authorLabel
+        );
 
-        StackPane root = new StackPane(menuOption);
-        Scene mainScene = new Scene(root, 400, 200);
+        StackPane rootPane = new StackPane(menuLayout);
+        Scene mainScene = new Scene(rootPane, 400, 200);
 
         primaryStage.setScene(mainScene);
         primaryStage.setTitle("Tetris Game");
         primaryStage.show();
+    }
+
+    /**
+     * Creates a standard menu button with a fixed width and action.
+     */
+    private Button createMenuButton(String text, Runnable action) {
+        Button button = new Button(text);
+        button.setPrefWidth(BUTTON_WIDTH);
+        button.setOnAction(e -> action.run());
+        return button;
+    }
+
+    /**
+     * Shows a confirmation dialog before exiting the application.
+     */
+    private void showExitConfirmation() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Exit Confirmation");
+        alert.setHeaderText(null);
+        alert.setContentText("Are you sure you want to exit the game?");
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            Platform.exit();
+        }
     }
 
     public static void main(String[] args) {
