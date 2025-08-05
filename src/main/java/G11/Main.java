@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import G11.panel.Configuration;
 import G11.panel.HighScore;
+import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -13,14 +14,45 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import javafx.util.Duration;
 
 public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        // Splash Screen
+        Stage splashStage = new Stage(StageStyle.UNDECORATED);
+        ImageView splashImage = new ImageView(
+                new Image(getClass().getResource("/TetrisSplash.png").toExternalForm())
+        );
+        splashImage.setFitWidth(300);
+        splashImage.setFitHeight(300);
+        splashImage.setPreserveRatio(true);
+        splashImage.setSmooth(true);
+
+        Label loadingLabel = new Label("Loading, please wait...");
+
+        StackPane splashLayout = new StackPane(splashImage, loadingLabel);
+        Scene splashScene = new Scene(splashLayout, 300, 300);
+        splashStage.setScene(splashScene);
+        splashStage.show();
+
+        // Delay before showing main stage
+        PauseTransition delay = new PauseTransition(Duration.seconds(3));
+        delay.setOnFinished(event -> {
+            splashStage.close();
+            showMainStage(primaryStage);
+        });
+        delay.play();
+    }
+
+    public void showMainStage(Stage primaryStage) {
         VBox menuOption = new VBox(10);
         menuOption.setPadding(new Insets(100));
         menuOption.setAlignment(Pos.CENTER);
@@ -65,9 +97,9 @@ public class Main extends Application {
         menuOption.getChildren().addAll(title, button_play, button_config, button_highScore, button_exit, author);
 
         StackPane root = new StackPane(menuOption);
-        Scene scene = new Scene(root, 400, 200);
+        Scene mainScene = new Scene(root, 400, 200);
 
-        primaryStage.setScene(scene);
+        primaryStage.setScene(mainScene);
         primaryStage.setTitle("Tetris Game");
         primaryStage.show();
     }
