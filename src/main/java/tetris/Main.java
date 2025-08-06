@@ -1,7 +1,5 @@
 package tetris;
 
-import tetris.panel.Configuration;
-import tetris.panel.HighScore;
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -19,6 +17,9 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
+import tetris.panel.Configuration;
+import tetris.panel.Game;
+import tetris.panel.HighScore;
 
 import java.util.Optional;
 
@@ -73,7 +74,7 @@ public class Main extends Application {
     /**
      * Displays the main menu screen.
      */
-    private void showMainMenu(Stage primaryStage) {
+    public void showMainMenu(Stage primaryStage) {
         VBox menuLayout = new VBox(MENU_SPACING);
         menuLayout.setPadding(new Insets(MENU_PADDING));
         menuLayout.setAlignment(Pos.CENTER);
@@ -82,7 +83,8 @@ public class Main extends Application {
 
         // Buttons
         Button playButton = createMenuButton("Play", () -> {
-            // TODO: Implement Play logic
+            primaryStage.hide();
+            new Game().startGame(primaryStage);
         });
 
         Button configButton = createMenuButton("Configuration", () -> {

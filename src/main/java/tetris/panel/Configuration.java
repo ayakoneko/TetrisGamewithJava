@@ -53,7 +53,7 @@ public class Configuration {
                 levelLabel, levelSlider
         );
 
-        // Checkbox 
+        // Checkbox
         VBox checkboxBox = new VBox(10);
         checkboxBox.setAlignment(Pos.CENTER_LEFT);
 
