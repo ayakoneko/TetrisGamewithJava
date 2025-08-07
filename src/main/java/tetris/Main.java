@@ -1,10 +1,14 @@
 package tetris;
 
+import java.net.URL;
+import java.util.Optional;
+
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -20,8 +24,6 @@ import javafx.util.Duration;
 import tetris.panel.Configuration;
 import tetris.panel.Game;
 import tetris.panel.HighScore;
-
-import java.util.Optional;
 
 public class Main extends Application {
 
@@ -40,7 +42,8 @@ public class Main extends Application {
     /**
      * Displays the splash screen before showing the main menu.
      */
-    private void showSplashScreen(Stage primaryStage) {
+    /* 
+     private void showSplashScreen(Stage primaryStage) {
         Stage splashStage = new Stage(StageStyle.UNDECORATED);
 
         // Splash image
@@ -70,6 +73,54 @@ public class Main extends Application {
         });
         delay.play();
     }
+    */
+    /**
+     * Displays the splash screen at app startup.
+     * 
+     * This version includes validation to handle missing image resources.
+     * If the splash image (TetrisSplash.png) is available in src/main/resources,
+     * it will be displayed. If not, a fallback text message will be shown instead
+     * to prevent the application from crashing with a NullPointerException.
+     * 
+     * After a short delay, the app transitions to the main menu.
+     */
+    private void showSplashScreen(Stage primaryStage) {
+        Stage splashStage = new Stage(StageStyle.UNDECORATED);
+    
+        Node splashContent;
+    
+        URL imageUrl = getClass().getResource("/TetrisSplash.png");
+        if (imageUrl != null) {
+            Image splashImage = new Image(imageUrl.toExternalForm());
+            ImageView splashImageView = new ImageView(splashImage);
+            splashImageView.setPreserveRatio(true);
+            splashImageView.setFitWidth(SPLASH_IMAGE_WIDTH);
+            splashImageView.setSmooth(true);
+            splashContent = splashImageView;
+        } else {
+            Label errorLabel = new Label("[Splash image not found]");
+            errorLabel.setStyle("-fx-text-fill: red; -fx-font-size: 16px;");
+            splashContent = errorLabel;
+        }
+    
+        Label loadingLabel = new Label("Loading, please wait...");
+    
+        VBox splashLayout = new VBox(splashContent, loadingLabel);
+        splashLayout.setAlignment(Pos.CENTER);
+    
+        Scene splashScene = new Scene(splashLayout);
+        splashStage.setScene(splashScene);
+        splashStage.sizeToScene();
+        splashStage.show();
+    
+        PauseTransition delay = new PauseTransition(Duration.seconds(SPLASH_DELAY_SECONDS));
+        delay.setOnFinished(event -> {
+            splashStage.close();
+            showMainMenu(primaryStage);
+        });
+        delay.play();
+    }
+    
 
     /**
      * Displays the main menu screen.
