@@ -136,6 +136,7 @@ public class Main extends Application {
         // Buttons
         Button playButton = createMenuButton("Play", () -> {
             primaryStage.hide();
+
             //new Game().startGame(primaryStage);
             GameController controller = new GameController();
             GameView gameView = new GameView(primaryStage, controller);
