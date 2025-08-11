@@ -1,8 +1,5 @@
 package tetris;
 
-import java.net.URL;
-import java.util.Optional;
-
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -21,9 +18,13 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
+import tetris.controller.GameController;
 import tetris.panel.Configuration;
-import tetris.panel.Game;
+import tetris.panel.GameView;
 import tetris.panel.HighScore;
+
+import java.net.URL;
+import java.util.Optional;
 
 public class Main extends Application {
 
@@ -135,7 +136,11 @@ public class Main extends Application {
         // Buttons
         Button playButton = createMenuButton("Play", () -> {
             primaryStage.hide();
-            new Game().startGame(primaryStage);
+
+            //new Game().startGame(primaryStage);
+            GameController controller = new GameController();
+            GameView gameView = new GameView(primaryStage, controller);
+            gameView.startGame();
         });
 
         Button configButton = createMenuButton("Configuration", () -> {
