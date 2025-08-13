@@ -1,5 +1,7 @@
 package tetris;
 
+import java.util.Optional;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -17,14 +19,15 @@ import tetris.panel.Configuration;
 import tetris.panel.GameView;
 import tetris.panel.HighScore;
 import tetris.panel.SplashWindow;
-import java.util.Optional;
 
 public class Main extends Application {
 
     // UI constants
-    private static final double BUTTON_WIDTH = 200;
-    private static final double MENU_PADDING = 100;
-    private static final double MENU_SPACING = 10;
+    private static final double BUTTON_WIDTH = 220;
+    private static final double BUTTON_HEIGHT = 50;
+    private static final double MENU_PADDING = 60;
+    private static final double MENU_SPACING = 20;
+    private static final double TITLE_SPACING = 40;
 
     @Override
    public void start(Stage primaryStage){
@@ -36,9 +39,17 @@ public class Main extends Application {
         menuLayout.setPadding(new Insets(MENU_PADDING));
         menuLayout.setAlignment(Pos.CENTER);
 
-        Label titleLabel = new Label("Main Page");
+        // Main title of the game
+        Label titleLabel = new Label("TETRIS GAME");
+        titleLabel.setStyle(
+            "-fx-font-family: 'Arial Black', 'Arial', sans-serif;" +
+            "-fx-font-size: 36px;" +
+            "-fx-font-weight: bold;" +
+            "-fx-text-fill: linear-gradient(to right, #4FC3F7, #29B6F6);" +
+            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 4, 0, 2, 2);"
+        );
 
-        // Buttons
+        // Navigation buttons
         Button playButton = createMenuButton("Play", () -> {
             primaryStage.hide();
 
@@ -60,22 +71,116 @@ public class Main extends Application {
 
         Button exitButton = createMenuButton("Exit", this::showExitConfirmation);
 
+        // Author credit label
         Label authorLabel = new Label("Author: G11");
+        authorLabel.setStyle(
+            "-fx-font-family: 'Arial', sans-serif;" +
+            "-fx-font-size: 14px;" +
+            "-fx-text-fill: #B0BEC5;" +
+            "-fx-padding: 20 0 0 0;"
+        );
 
-        menuLayout.getChildren().addAll(titleLabel, playButton, configButton, highScoreButton, exitButton, authorLabel);
+        // Layout containers for proper spacing
+        VBox titleContainer = new VBox(TITLE_SPACING);
+        titleContainer.setAlignment(Pos.CENTER);
+        titleContainer.getChildren().add(titleLabel);
 
+        VBox buttonContainer = new VBox(MENU_SPACING);
+        buttonContainer.setAlignment(Pos.CENTER);
+        buttonContainer.getChildren().addAll(playButton, configButton, highScoreButton, exitButton);
+
+        menuLayout.getChildren().addAll(titleContainer, buttonContainer, authorLabel);
+
+        // Main background container
         StackPane rootPane = new StackPane(menuLayout);
-        Scene mainScene = new Scene(rootPane, 400, 200);
+        rootPane.setStyle(
+            "-fx-background-color: linear-gradient(to bottom, #263238, #37474F);"
+        );
+        
+        Scene mainScene = new Scene(rootPane, 500, 650);
 
         primaryStage.setScene(mainScene);
         primaryStage.setTitle("Tetris Game");
         primaryStage.show();
     }
 
-    //Creates a standard menu button with a fixed width and action.
+    // Creates a styled menu button with the given text and action
     private Button createMenuButton(String text, Runnable action) {
         Button button = new Button(text);
         button.setPrefWidth(BUTTON_WIDTH);
+        button.setPrefHeight(BUTTON_HEIGHT);
+        
+        // Base button styling
+        button.setStyle(
+            "-fx-font-family: 'Arial', sans-serif;" +
+            "-fx-font-size: 16px;" +
+            "-fx-font-weight: bold;" +
+            "-fx-text-fill: white;" +
+            "-fx-background-color: linear-gradient(to bottom, #546E7A, #455A64);" +
+            "-fx-background-radius: 8;" +
+            "-fx-border-radius: 8;" +
+            "-fx-border-color: #78909C;" +
+            "-fx-border-width: 1;" +
+            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 3, 0, 1, 1);" +
+            "-fx-cursor: hand;"
+        );
+        
+        // Button hover effects
+        button.setOnMouseEntered(e -> {
+            button.setStyle(
+                "-fx-font-family: 'Arial', sans-serif;" +
+                "-fx-font-size: 16px;" +
+                "-fx-font-weight: bold;" +
+                "-fx-text-fill: white;" +
+                "-fx-background-color: linear-gradient(to bottom, #607D8B, #546E7A);" +
+                "-fx-background-radius: 8;" +
+                "-fx-border-radius: 8;" +
+                "-fx-border-color: #90A4AE;" +
+                "-fx-border-width: 2;" +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 5, 0, 2, 2);" +
+                "-fx-cursor: hand;" +
+                "-fx-scale-x: 1.02;" +
+                "-fx-scale-y: 1.02;"
+            );
+        });
+        
+        button.setOnMouseExited(e -> {
+            button.setStyle(
+                "-fx-font-family: 'Arial', sans-serif;" +
+                "-fx-font-size: 16px;" +
+                "-fx-font-weight: bold;" +
+                "-fx-text-fill: white;" +
+                "-fx-background-color: linear-gradient(to bottom, #546E7A, #455A64);" +
+                "-fx-background-radius: 8;" +
+                "-fx-border-radius: 8;" +
+                "-fx-border-color: #78909C;" +
+                "-fx-border-width: 1;" +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 3, 0, 1, 1);" +
+                "-fx-cursor: hand;" +
+                "-fx-scale-x: 1.0;" +
+                "-fx-scale-y: 1.0;"
+            );
+        });
+        
+        // Button press effects
+        button.setOnMousePressed(e -> {
+            button.setStyle(
+                "-fx-font-family: 'Arial', sans-serif;" +
+                "-fx-font-size: 16px;" +
+                "-fx-font-weight: bold;" +
+                "-fx-text-fill: white;" +
+                "-fx-background-color: linear-gradient(to bottom, #455A64, #37474F);" +
+                "-fx-background-radius: 8;" +
+                "-fx-border-radius: 8;" +
+                "-fx-border-color: #607D8B;" +
+                "-fx-border-width: 2;" +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 1, 0, 0, 0);" +
+                "-fx-cursor: hand;" +
+                "-fx-scale-x: 0.98;" +
+                "-fx-scale-y: 0.98;"
+            );
+        });
+        
         button.setOnAction(e -> action.run());
         return button;
     }
