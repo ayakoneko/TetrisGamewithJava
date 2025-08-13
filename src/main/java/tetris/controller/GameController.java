@@ -4,21 +4,20 @@ import tetris.model.GameBoard;
 /**
  * GameController: Game flow management. GameView - Controller - data handling(GameBoard)
  */
-public class GameController {
-    public enum State { PLAY, PAUSE, GAME_OVER }
+public class GameController implements IGameController{
     private final GameBoard board = new GameBoard();
     private State state = State.PLAY;
 
-    public GameBoard board(){ return board; }
-    public State state(){ return state; }
+    @Override public GameBoard board(){ return board; }
+    @Override public IGameController.State state(){ return state; }
 
+    @Override
     public void start(){
         state = State.PLAY;
         if (!board.newPiece()) state = State.GAME_OVER;
     }
 
-    /** Handle the main game loop
-     *  Current piece down each tick*/
+    @Override
     public void tick(){
         if (state != State.PLAY) return;
 
@@ -33,28 +32,33 @@ public class GameController {
     }
 
     // Key handling (arrow keys, Esc, Space bar, Restart, Pause)
-    public void moveLeft(){ if (state==State.PLAY) board.moveLeft(); }
-    public void moveRight(){ if (state==State.PLAY) board.moveRight(); }
-    public void rotateCW(){ if (state==State.PLAY) board.rotateCW(); }
-    public void softDrop(){ if (state==State.PLAY) board.softDropStep(); }
+    @Override public void moveLeft(){ if (state==State.PLAY) board.moveLeft(); }
+    @Override public void moveRight(){ if (state==State.PLAY) board.moveRight(); }
+    @Override public void rotateCW(){ if (state==State.PLAY) board.rotateCW(); }
+    @Override public void softDrop(){ if (state==State.PLAY) board.softDropStep(); }
+
+    @Override
     public void hardDrop() {
         if (state != State.PLAY) return;
         board.hardDrop();
-        int cleared = board.clearFullLines();
+        board.clearFullLines();
         if (!board.newPiece()) state = State.GAME_OVER;
     }
 
+    @Override
     public void togglePause(){
         if (state==State.PLAY) state = State.PAUSE;
         else if (state==State.PAUSE) state = State.PLAY;
     }
 
+    @Override
     public void restart() {
         state = State.PLAY;
         board.reset();
         if (!board.newPiece()) state = State.GAME_OVER;
     }
 
+    @Override
     public void reset() {
         board.reset();
         state = State.PLAY;

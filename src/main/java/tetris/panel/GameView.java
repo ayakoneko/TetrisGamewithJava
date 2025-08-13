@@ -19,6 +19,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import tetris.Main;
 import tetris.controller.GameController;
+import tetris.controller.IGameController;
 import tetris.model.GameBoard;
 import tetris.model.Tetromino;
 
@@ -97,7 +98,7 @@ public class GameView {
                 case SPACE -> controller.hardDrop();
                 case P -> togglePause();
                 case R -> {
-                    if (controller.state() == GameController.State.GAME_OVER) {
+                    if (controller.state() == IGameController.State.GAME_OVER) {
                         controller.restart();
                         loop.start();
                         draw();
@@ -124,9 +125,9 @@ public class GameView {
     // Toggles pause state and updates the game loop accordingly.
     private void togglePause() {
         controller.togglePause();
-        if (controller.state() == GameController.State.PAUSE) {
+        if (controller.state() == IGameController.State.PAUSE) {
             loop.stop();
-        } else if (controller.state() == GameController.State.PLAY) {
+        } else if (controller.state() == IGameController.State.PLAY) {
             loop.start();
         }
         draw(); // Update overlay text
@@ -134,7 +135,7 @@ public class GameView {
 
     // Shows confirmation dialog before returning to main menu.
     private void askExitToMenu() {
-        boolean wasPlaying = (controller.state() == GameController.State.PLAY);
+        boolean wasPlaying = (controller.state() == IGameController.State.PLAY);
 
         if (wasPlaying) {             // Pause game before show alert
             controller.togglePause(); // PLAY -> PAUSE
