@@ -2,28 +2,20 @@ package tetris.model;
 
 import java.util.Random;
 
-/**
- * GameBoard : Tetris playfield and manages all game logic
- *  newPiece()       : Spawn a new tetromino; returns false if spawn is blocked.
- *  canMove()        : Check if a tetromino can move/rotate without collisions.
- *  moveLeft/Right() : Move the current piece horizontally.
- *  rotateCW()       : Rotate the current piece clockwise.
- *  softDropStep()   : Move the piece down one cell.
- *  hardDrop()       : Drop the piece to the bottom.
- *  lockCurrent()    : Fix the current piece into the board; returns false if overflow occurred.
- *  clearFullLines() : Remove any complete lines and shift above lines down.
- *  reset()          : Clear the board and start with a new piece.
- */
-public class GameBoard {
-    public static final int W = 10, H = 20;         // Width and height of the board
+public class GameBoard implements IGameBoard {
+    public static final int W = 10, H = 20;
     private final int[][] board = new int[H][W];
 
-    private final Random rnd = new Random();        // create random block
-    private Tetromino current;                      // Currently falling block
+    private final Random rnd = new Random(); // create random block
+    private Tetromino current; // Currently falling block
 
-    public int[][] cells(){ return board; }
-    public Tetromino current(){ return current; }
+    @Override public int[][] cells(){ return board; }
+    @Override public Tetromino current(){ return current; }
 
+    @Override public int getWidth() { return W; }
+    @Override public int getHeight() { return H; }
+
+    @Override
     public boolean newPiece() {
         TetrominoType[] tt = TetrominoType.values();
         TetrominoType t = tt[rnd.nextInt(tt.length)];
@@ -37,6 +29,7 @@ public class GameBoard {
         return true;
     }
 
+    @Override
     public boolean canMove(Tetromino t, int dx, int dy, int newRot){
         int[][] s = t.type.rot[newRot];
         for (int r=0;r<4;r++){
@@ -59,19 +52,26 @@ public class GameBoard {
         return true;
     }
 
+    @Override
     public void moveLeft(){
         if (current!=null && canMove(current,-1,0,current.rot))
             current.moveBy(-1,0);
     }
+
+    @Override
     public void moveRight(){
         if (current!=null && canMove(current, +1,0,current.rot))
             current.moveBy(1,0);
     }
+
+    @Override
     public void rotateCW(){
         if (current==null) return;
         int nr = (current.rot+1) & 3;                            // current.rot+1 : rotate block 90° clockwise
         if (canMove(current, 0,0, nr)) current.rot = nr; // Check rotated block is not reach to the end
     }
+
+    @Override
     public boolean softDropStep(){
         if (current==null) return false;
         if (canMove(current,0,1,current.rot)) {
@@ -79,6 +79,8 @@ public class GameBoard {
         }
         return false;
     }
+
+    @Override
     public void hardDrop() {
         if (current == null) return;
         while (canMove(current, 0, 1, current.rot)) current.moveBy(0,1);
@@ -86,6 +88,7 @@ public class GameBoard {
     }
 
     /** Locks the current tetromino into the board grid */
+    @Override
     public boolean lockCurrent(){
         if (current==null) return false;
         boolean overflow = false;
@@ -103,6 +106,7 @@ public class GameBoard {
     }
 
     /** Removes full lines from the board and shifts lines above down */
+    @Override
     public int clearFullLines(){
         int write = H-1, cleared = 0;
         for (int read = H-1; read>=0; read--){
@@ -122,6 +126,7 @@ public class GameBoard {
     }
 
     /** Game Restart */
+    @Override
     public void reset() {
         for (int y = 0; y < H; y++) {
             for (int x = 0; x < W; x++) board[y][x] = 0;

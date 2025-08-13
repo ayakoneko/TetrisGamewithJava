@@ -1,11 +1,11 @@
 package tetris.controller;
 
-import tetris.model.GameBoard;
+import tetris.model.IGameBoard;
 
 public interface IGameController {
     enum State { PLAY, PAUSE, GAME_OVER }
 
-    GameBoard board();
+    IGameBoard board();
     State state();
 
     void start();
