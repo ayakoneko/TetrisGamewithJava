@@ -1,7 +1,6 @@
 package tetris.panel;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
+import javafx.animation.AnimationTimer;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
@@ -18,7 +17,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 import tetris.Main;
 import tetris.controller.GameController;
 import tetris.model.GameBoard;
@@ -47,7 +45,10 @@ public class GameView {
     private final Stage stage;
     private final GameController controller;
     private final Canvas canvas;
-    private final Timeline loop;
+    private final AnimationTimer loop;
+
+    private long lastUpdate = 0;
+    private long dropInterval = 500_000_000;
 
     public GameView(Stage stage, GameController controller) {
         this.stage = stage;
@@ -58,16 +59,20 @@ public class GameView {
         int h = GameBoard.H * TILE + PADDING * 2;
         this.canvas = new Canvas(w, h);
 
-        // Game loop: Every 500ms → controller.tick() → draw()
-        this.loop = new Timeline(new KeyFrame(Duration.millis(500), e -> {
-            controller.tick();
-            draw();
-        }));
-        loop.setCycleCount(Timeline.INDEFINITE);
+        // Game loop: Every drop interval (default 500ms) → controller.tick() → draw()
+        this.loop = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                if (now - lastUpdate >= dropInterval) {
+                    controller.tick();
+                    draw();
+                    lastUpdate = now;
+                }
+            }
+        };
     }
 
-    public void startGame() {
-        // Layout
+    public Scene buildScreen() {
         Button backBtn = new Button("Back");
         backBtn.setOnAction(e -> askExitToMenu());
 
@@ -79,77 +84,70 @@ public class GameView {
         root.setCenter(canvas);
         root.setBottom(bottomBar);
 
-        Scene scene = new Scene(root, canvas.getWidth(), canvas.getHeight()+40);    // added 40 to fit back button
-        stage.setScene(scene);
+        Scene scene = new Scene(root, canvas.getWidth(), canvas.getHeight() + 40);    // added 40 to fit back button
         stage.setTitle("Tetris - Play");
 
         // Keyboard input handling
         scene.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
             switch (e.getCode()) {
-                case LEFT, RIGHT, UP, DOWN, SPACE, P, R -> {
-                    // 게임 키는 여기서 처리
-                    switch (e.getCode()) {
-                        case LEFT -> controller.moveLeft();
-                        case RIGHT -> controller.moveRight();
-                        case UP -> controller.rotateCW();
-                        case DOWN -> controller.softDrop();
-                        case SPACE -> controller.hardDrop();
-                        case P -> togglePause();
-                        case R -> {
-                            if (controller.state() == GameController.State.GAME_OVER) {
-                                controller.restart();
-                                loop.play();
-                                draw();
-                            }
-                        }
+                case LEFT -> controller.moveLeft();
+                case RIGHT -> controller.moveRight();
+                case UP -> controller.rotateCW();
+                case DOWN -> controller.softDrop();
+                case SPACE -> controller.hardDrop();
+                case P -> togglePause();
+                case R -> {
+                    if (controller.state() == GameController.State.GAME_OVER) {
+                        controller.restart();
+                        loop.start();
+                        draw();
                     }
-                    draw();
-                    e.consume();
                 }
-                case ESCAPE -> {
-                    askExitToMenu();
-                    e.consume();
-                }
+                case ESCAPE -> askExitToMenu();
                 default -> { /* ignore */ }
             }
+            draw();
+            e.consume();
         });
 
-        // Start game
+        return scene;
+    }
+
+    public void startGame(){
+        stage.setScene(buildScreen());
         controller.start();
         stage.show();
-        loop.play();
+        loop.start();
         draw();
     }
 
-    /**
-     * Toggles pause state and updates the game loop accordingly.
-     */
+    // Toggles pause state and updates the game loop accordingly.
     private void togglePause() {
         controller.togglePause();
         if (controller.state() == GameController.State.PAUSE) {
-            loop.pause();
+            loop.stop();
         } else if (controller.state() == GameController.State.PLAY) {
-            loop.play();
+            loop.start();
         }
         draw(); // Update overlay text
     }
 
-    /**
-     * Shows confirmation dialog before returning to main menu.
-     */
+    // Shows confirmation dialog before returning to main menu.
     private void askExitToMenu() {
         boolean wasPlaying = (controller.state() == GameController.State.PLAY);
 
         if (wasPlaying) {             // Pause game before show alert
             controller.togglePause(); // PLAY -> PAUSE
-            loop.pause();
+            loop.stop();
             draw();
         }
+
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Stop Game");
         alert.setHeaderText(null);
         alert.setContentText("Are you sure to stop the current game?");
         Optional<ButtonType> result = alert.showAndWait();
+
         if (result.isPresent() && result.get() == ButtonType.OK) {
             loop.stop();
             controller.reset();
@@ -158,7 +156,7 @@ public class GameView {
         } else {                // Press Exit -> select No
             if (wasPlaying) {   // Press Exit While playing game
                 controller.togglePause(); // PAUSE -> PLAY
-                loop.play();
+                loop.start();
                 draw();
             }
         }
@@ -193,9 +191,7 @@ public class GameView {
         }
     }
 
-    /**
-     * Draws both fixed cells and the current tetromino.
-     */
+    // Draws both fixed cells and the current tetromino.
     private void drawBoardCells(GraphicsContext g, double bx, double by) {
         int[][] cells = controller.board().cells();
 

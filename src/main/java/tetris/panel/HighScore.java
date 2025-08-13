@@ -12,15 +12,12 @@ import javafx.stage.Stage;
 public class HighScore {
 
     public void startHighScore(Stage mainStage) {
-        // Create a new window for the high score screen
         Stage scoreStage = new Stage();
 
-        // Layout container for the screen elements
-        VBox layout = new VBox(10);
+        VBox layout = new VBox(15);
         layout.setPadding(new Insets(100));
         layout.setAlignment(Pos.CENTER);
 
-        // Title label
         Label title = new Label("High Scores");
 
         // Array of dummy high score entries with Simpsons character names
@@ -30,7 +27,6 @@ public class HighScore {
                 "9. Milhouse - 700", "10. Ralph Wiggum - 600"
         };
 
-        // Add the title to the layout
         layout.getChildren().add(title);
 
         // Add each high score entry as a label
@@ -39,7 +35,6 @@ public class HighScore {
             layout.getChildren().add(scoreLabel);
         }
 
-        // Back button to return to the main screen
         Button backButton = new Button("Back");
         backButton.setPrefWidth(200);
         backButton.setOnAction(e -> {
@@ -47,10 +42,8 @@ public class HighScore {
             mainStage.show();
         });
 
-        // Add the back button to the layout
         layout.getChildren().add(backButton);
 
-        // Set up the scene and show the high score window
         StackPane root = new StackPane(layout);
         Scene scene = new Scene(root, 400, 400);
 
