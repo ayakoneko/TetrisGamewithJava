@@ -42,8 +42,8 @@ public class GameBoard {
         for (int r=0;r<4;r++){
             for (int c=0;c<4;c++){
                 if (s[r][c]==0) continue;
-                int nx = t.x + c + dx;
-                int ny = t.y + r + dy;
+                int nx = t.x() + c + dx;
+                int ny = t.y() + r + dy;
 
                 // Check left, right end and bottom
                 if (nx < 0 || nx >= W) return false;
@@ -61,11 +61,11 @@ public class GameBoard {
 
     public void moveLeft(){
         if (current!=null && canMove(current,-1,0,current.rot))
-            current.x--;
+            current.moveBy(-1,0);
     }
     public void moveRight(){
         if (current!=null && canMove(current, +1,0,current.rot))
-            current.x++;
+            current.moveBy(1,0);
     }
     public void rotateCW(){
         if (current==null) return;
@@ -75,13 +75,13 @@ public class GameBoard {
     public boolean softDropStep(){
         if (current==null) return false;
         if (canMove(current,0,1,current.rot)) {
-            current.y++; return true;
+            current.moveBy(0,1); return true;
         }
         return false;
     }
     public void hardDrop() {
         if (current == null) return;
-        while (canMove(current, 0, 1, current.rot)) current.y++;
+        while (canMove(current, 0, 1, current.rot)) current.moveBy(0,1);
         lockCurrent();
     }
 
@@ -93,7 +93,7 @@ public class GameBoard {
         for (int r=0;r<4;r++){
             for (int c=0;c<4;c++){
                 if (s[r][c]==0) continue;
-                int bx = current.x + c, by = current.y + r;
+                int bx = current.x() + c, by = current.y() + r;
                 if (by < 0) { overflow = true; continue; }
                 if (by < H && bx >= 0 && bx < W) board[by][bx] = current.colorId();
             }
