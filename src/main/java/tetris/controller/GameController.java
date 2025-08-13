@@ -1,16 +1,26 @@
 package tetris.controller;
 
 import tetris.model.GameBoard;
+import tetris.model.IGameBoard;
+
 /**
  * GameController: Game flow management. GameView - Controller - data handling(GameBoard)
  */
 public class GameController implements IGameController{
-    private final GameBoard board = new GameBoard();
+    private final IGameBoard board;
     private State state = State.PLAY;
 
-    @Override public GameBoard board(){ return board; }
-    @Override public IGameController.State state(){ return state; }
+    public GameController(IGameBoard board) {this.board = board;}
 
+    public GameController() {this(new GameBoard());}
+
+    @Override
+    public IGameBoard board() {return board;}
+
+    @Override
+    public State state() {
+        return state;
+    }
     @Override
     public void start(){
         state = State.PLAY;
