@@ -54,7 +54,6 @@ public class Main extends Application {
         Stage splashStage = new Stage(StageStyle.UNDECORATED);
     
         Node splashContent;
-    
         URL imageUrl = getClass().getResource("/TetrisSplash.png");
         if (imageUrl != null) {
             Image splashImage = new Image(imageUrl.toExternalForm());
@@ -68,11 +67,20 @@ public class Main extends Application {
             errorLabel.setStyle("-fx-text-fill: red; -fx-font-size: 16px;");
             splashContent = errorLabel;
         }
-    
+
+        Label groupLabel = new Label("Group G11 - Tetris Project");
+        Label courseLabel = new Label("7010ICT - Object Oriented Software Development");
+        Label uniLabel = new Label("Griffith University - Trimester 2, 2025");
         Label loadingLabel = new Label("Loading, please wait...");
+
+        groupLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;");
+        courseLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: lightgray;");
+        uniLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: lightgray;");
+        loadingLabel.setStyle("-fx-font-size: 20px; -fx-text-fill: orange;");
     
-        VBox splashLayout = new VBox(splashContent, loadingLabel);
+        VBox splashLayout = new VBox(splashContent, groupLabel, courseLabel, uniLabel, loadingLabel);
         splashLayout.setAlignment(Pos.CENTER);
+        splashLayout.setStyle("-fx-background-color: #111318; -fx-padding: 20;");
     
         Scene splashScene = new Scene(splashLayout);
         splashStage.setScene(splashScene);

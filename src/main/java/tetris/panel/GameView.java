@@ -210,8 +210,8 @@ public class GameView {
             for (int r = 0; r < 4; r++) {
                 for (int c = 0; c < 4; c++) {
                     if (s[r][c] == 0) continue;
-                    int gx = cur.x + c;
-                    int gy = cur.y + r;
+                    int gx = cur.x() + c;
+                    int gy = cur.y() + r;
                     if (gy >= 0) {
                         drawCell(g, bx, by, gx, gy, cur.colorId());
                     }
