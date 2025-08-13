@@ -41,41 +41,6 @@ public class Main extends Application {
     }
 
     /**
-     * Displays the splash screen before showing the main menu.
-     */
-    /* 
-     private void showSplashScreen(Stage primaryStage) {
-        Stage splashStage = new Stage(StageStyle.UNDECORATED);
-
-        // Splash image
-        Image splashImage = new Image(getClass().getResource("/TetrisSplash.png").toExternalForm());
-        ImageView splashImageView = new ImageView(splashImage);
-        splashImageView.setPreserveRatio(true);
-        splashImageView.setFitWidth(SPLASH_IMAGE_WIDTH);
-        splashImageView.setSmooth(true);
-
-        // Loading text
-        Label loadingLabel = new Label("Loading, please wait...");
-
-        // Layout
-        VBox splashLayout = new VBox(splashImageView, loadingLabel);
-        splashLayout.setAlignment(Pos.CENTER);
-
-        Scene splashScene = new Scene(splashLayout);
-        splashStage.setScene(splashScene);
-        splashStage.sizeToScene();
-        splashStage.show();
-
-        // Delay before main menu
-        PauseTransition delay = new PauseTransition(Duration.seconds(SPLASH_DELAY_SECONDS));
-        delay.setOnFinished(event -> {
-            splashStage.close();
-            showMainMenu(primaryStage);
-        });
-        delay.play();
-    }
-    */
-    /**
      * Displays the splash screen at app startup.
      * 
      * This version includes validation to handle missing image resources.
@@ -123,9 +88,7 @@ public class Main extends Application {
     }
     
 
-    /**
-     * Displays the main menu screen.
-     */
+    //Displays the main menu screen.
     public void showMainMenu(Stage primaryStage) {
         VBox menuLayout = new VBox(MENU_SPACING);
         menuLayout.setPadding(new Insets(MENU_PADDING));
@@ -174,9 +137,7 @@ public class Main extends Application {
         primaryStage.show();
     }
 
-    /**
-     * Creates a standard menu button with a fixed width and action.
-     */
+    //Creates a standard menu button with a fixed width and action.
     private Button createMenuButton(String text, Runnable action) {
         Button button = new Button(text);
         button.setPrefWidth(BUTTON_WIDTH);
@@ -184,9 +145,7 @@ public class Main extends Application {
         return button;
     }
 
-    /**
-     * Shows a confirmation dialog before exiting the application.
-     */
+    // Shows a confirmation dialog before exiting the application.
     private void showExitConfirmation() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Exit Confirmation");
