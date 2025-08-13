@@ -17,5 +17,6 @@ public class Tetromino {
     }
 
     public int[][] shape(){ return type.rot[rot]; }
+
     public int colorId(){ return type.colorId; }
 }

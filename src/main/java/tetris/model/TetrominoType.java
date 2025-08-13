@@ -49,12 +49,12 @@ public enum TetrominoType {
     });
 
     public final int colorId;
-    // rot[0..3][4][4]
+    // rot[0..3][4][4], rot[rotationIndex][row][column]
     public final int[][][] rot;
 
     TetrominoType(int colorId, int[][] base0) {
         this.colorId = colorId;
-        this.rot = new int[4][4][4];
+        this.rot = new int[4][4][4]; //create a rotation state of 4 (0/90/180/270) and 4 rows * 4 columns
         this.rot[0] = base0;
         for (int r = 1; r < 4; r++) {
             this.rot[r] = rotateCW(this.rot[r-1]);
