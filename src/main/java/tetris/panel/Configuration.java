@@ -8,6 +8,9 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -18,6 +21,7 @@ public class Configuration {
     private static final double BUTTON_HEIGHT = 40;
     private static final double SECTION_SPACING = 15;
     private static final double CONTROL_SPACING = 8;
+    private static final double SLIDER_WIDTH = 400; // Increased slider width
 
     public void startConfig(Stage mainStage) {
         Stage configStage = new Stage(); // New page
@@ -59,18 +63,39 @@ public class Configuration {
         // Game configuration controls
         Label widthLabel = createStyledLabel("Field Width (No of cells):");
         Slider widthSlider = createStyledSlider(5, 15, 10);
+        widthSlider.setPrefWidth(SLIDER_WIDTH); // Set preferred width
+        Label widthValueLabel = createStyledValueLabel(widthSlider.getValue());
+        widthSlider.valueProperty().addListener((obs, oldVal, newVal) ->
+            widthValueLabel.setText(String.format("%.0f", newVal))
+        );
+        HBox widthControlBox = new HBox(CONTROL_SPACING, widthSlider, widthValueLabel);
+        widthControlBox.setAlignment(Pos.CENTER_LEFT);
 
         Label heightLabel = createStyledLabel("Field Height (No of cells):");
         Slider heightSlider = createStyledSlider(15, 30, 20);
+        heightSlider.setPrefWidth(SLIDER_WIDTH); // Set preferred width
+        Label heightValueLabel = createStyledValueLabel(heightSlider.getValue());
+        heightSlider.valueProperty().addListener((obs, oldVal, newVal) ->
+            heightValueLabel.setText(String.format("%.0f", newVal))
+        );
+        HBox heightControlBox = new HBox(CONTROL_SPACING, heightSlider, heightValueLabel);
+        heightControlBox.setAlignment(Pos.CENTER_LEFT);
 
         Label levelLabel = createStyledLabel("Game Level:");
         Slider levelSlider = createStyledSlider(1, 10, 6);
+        levelSlider.setPrefWidth(SLIDER_WIDTH); // Set preferred width
+        Label levelValueLabel = createStyledValueLabel(levelSlider.getValue());
+        levelSlider.valueProperty().addListener((obs, oldVal, newVal) ->
+            levelValueLabel.setText(String.format("%.0f", newVal))
+        );
+        HBox levelControlBox = new HBox(CONTROL_SPACING, levelSlider, levelValueLabel);
+        levelControlBox.setAlignment(Pos.CENTER_LEFT);
 
         slidersBox.getChildren().addAll(
                 slidersTitle,
-                widthLabel, widthSlider,
-                heightLabel, heightSlider,
-                levelLabel, levelSlider
+                widthLabel, widthControlBox,
+                heightLabel, heightControlBox,
+                levelLabel, levelControlBox
         );
 
         // Container for game option toggles
@@ -93,12 +118,12 @@ public class Configuration {
             "-fx-padding: 0 0 5 0;"
         );
 
-        CheckBox musicCheck = createStyledCheckBox("Music (On/Off)", true);
-        CheckBox soundCheck = createStyledCheckBox("Sound Effect (On/Off)", true);
-        CheckBox aiCheck = createStyledCheckBox("AI Play (On/Off)", false);
-        CheckBox extendCheck = createStyledCheckBox("Extend Mode (On/Off)", false);
+        HBox musicControlBox = createStyledCheckBoxWithLabel("Music", true);
+        HBox soundControlBox = createStyledCheckBoxWithLabel("Sound Effect", true);
+        HBox aiControlBox = createStyledCheckBoxWithLabel("AI Play", false);
+        HBox extendControlBox = createStyledCheckBoxWithLabel("Extend Mode", false);
 
-        checkboxBox.getChildren().addAll(optionsTitle, musicCheck, soundCheck, aiCheck, extendCheck);
+        checkboxBox.getChildren().addAll(optionsTitle, musicControlBox, soundControlBox, aiControlBox, extendControlBox);
 
         // Button to return to Main Menu
         Button button_back = createStyledButton("Back");
@@ -135,12 +160,26 @@ public class Configuration {
         return label;
     }
 
+    // Creates a styled label to display the slider's value
+    private Label createStyledValueLabel(double initialValue) {
+        Label label = new Label(String.format("%.0f", initialValue));
+        label.setStyle(
+            "-fx-font-family: 'Arial', sans-serif;" +
+            "-fx-font-size: 12px;" +
+            "-fx-text-fill: #E0E0E0;" +
+            "-fx-font-weight: bold;" +
+            "-fx-padding: 0 0 0 10;"
+        );
+        return label;
+    }
+
     // Creates a styled slider with tick marks and labels
     private Slider createStyledSlider(double min, double max, double value) {
         Slider slider = new Slider(min, max, value);
         slider.setShowTickLabels(true);
         slider.setShowTickMarks(true);
         slider.setMajorTickUnit(1);
+        slider.setMinorTickCount(0);
         slider.setSnapToTicks(true);
         slider.setStyle(
             "-fx-control-inner-background: #455A64;" +
@@ -151,18 +190,54 @@ public class Configuration {
         return slider;
     }
 
-    // Creates a styled checkbox with the given text and selection state
-    private CheckBox createStyledCheckBox(String text, boolean selected) {
+    // Creates a styled HBox containing a checkbox and a label that shows "On/Off" status
+    private HBox createStyledCheckBoxWithLabel(String text, boolean initialSelected) {
+        // HBox to contain the checkbox and the status label
+        HBox controlBox = new HBox(CONTROL_SPACING);
+        controlBox.setAlignment(Pos.CENTER_LEFT);
+        
+        // The CheckBox control with the text directly on it
         CheckBox checkBox = new CheckBox(text);
-        checkBox.setSelected(selected);
+        checkBox.setSelected(initialSelected);
+        
         checkBox.setStyle(
             "-fx-font-family: 'Arial', sans-serif;" +
             "-fx-font-size: 12px;" +
-            "-fx-text-fill: #E0E0E0;" +
+            "-fx-font-weight: bold;" + 
+            "-fx-text-fill: #E0E0E0;" + 
             "-fx-padding: 3 0 3 0;"
         );
-        return checkBox;
+        
+        // The status label that shows "On" or "Off"
+        Label statusLabel = new Label(initialSelected ? "On" : "Off");
+        
+        // Initial style for the status label based on the initial state
+        if (initialSelected) {
+            statusLabel.setStyle("-fx-font-family: 'Arial', sans-serif; -fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: green; -fx-padding: 0 0 0 10;");
+        } else {
+            statusLabel.setStyle("-fx-font-family: 'Arial', sans-serif; -fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #FF3232; -fx-padding: 0 0 0 10;");
+        }
+        
+        // Listener to update the label text and color when the checkbox is toggled
+        checkBox.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
+            statusLabel.setText(isSelected ? "On" : "Off");
+            // Set text color based on the new state
+            if (isSelected) {
+                statusLabel.setStyle("-fx-font-family: 'Arial', sans-serif; -fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: green; -fx-padding: 0 0 0 10;");
+            } else {
+                statusLabel.setStyle("-fx-font-family: 'Arial', sans-serif; -fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #FF3232; -fx-padding: 0 0 0 10;");
+            }
+        });
+
+        // Add components to the HBox. The Region is a flexible spacer.
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        controlBox.getChildren().addAll(checkBox, spacer, statusLabel);
+        
+        return controlBox;
     }
+
 
     // Creates a styled button with the given text
     private Button createStyledButton(String text) {
@@ -232,7 +307,7 @@ public class Configuration {
                 "-fx-background-color: linear-gradient(to bottom, #455A64, #37474F);" +
                 "-fx-background-radius: 6;" +
                 "-fx-border-radius: 6;" +
-                "-fx-border-color: #607D8B;" +
+            "-fx-border-color: #607D8B;" +
                 "-fx-border-width: 2;" +
                 "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 1, 0, 0, 0);" +
                 "-fx-cursor: hand;" +
