@@ -17,9 +17,7 @@ public class HighScore {
     private static final double SCORE_SPACING = 12;
     private static final double SECTION_SPACING = 30;
 
-    public void startHighScore(Stage mainStage) {
-        Stage scoreStage = new Stage();
-
+    public void startHighScore(Stage stage) {
         VBox layout = new VBox(SECTION_SPACING);
         layout.setPadding(new Insets(40));
         layout.setAlignment(Pos.CENTER);
@@ -77,10 +75,7 @@ public class HighScore {
 
         // Button to return to Main Menu
         Button backButton = createStyledButton("Back");
-        backButton.setOnAction(e -> {
-            scoreStage.close();
-            mainStage.show();
-        });
+        backButton.setOnAction(e -> new tetris.Main().showMainMenu(stage));
 
         layout.getChildren().addAll(title, scoresContainer, backButton);
 
@@ -92,9 +87,15 @@ public class HighScore {
         
         Scene scene = new Scene(root, 500, 700);
 
-        scoreStage.setScene(scene);
-        scoreStage.setTitle("High Scores");
-        scoreStage.show();
+        stage.setScene(scene);
+        stage.setTitle("High Scores");
+
+        stage.setOnCloseRequest(evt -> {                            // ✅ CHANGED: ✕ behaves like Back
+            evt.consume();
+            new tetris.Main().showMainMenu(stage);
+        });
+
+        stage.show();
     }
 
     // Creates a styled button with the given text
