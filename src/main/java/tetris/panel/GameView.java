@@ -1,6 +1,5 @@
 package tetris.panel;
 
-import javafx.animation.AnimationTimer;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
@@ -46,10 +45,9 @@ public class GameView {
     private final Stage stage;
     private final GameController controller;
     private final Canvas canvas;
-    private final AnimationTimer loop;
+    private final GameLoop loop;
 
-    private long lastUpdate = 0;
-    private long dropInterval = 500_000_000;
+    private long dropInterval = 500_000_000; //0.5sec
 
     public GameView(Stage stage, GameController controller) {
         this.stage = stage;
@@ -61,15 +59,9 @@ public class GameView {
         this.canvas = new Canvas(w, h);
 
         // Game loop: Every drop interval (default 500ms) → controller.tick() → draw()
-        this.loop = new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-                if (now - lastUpdate >= dropInterval) {
-                    controller.tick();
-                    draw();
-                    lastUpdate = now;
-                }
-            }
+        this.loop = new GameLoop(dropInterval) {
+            @Override protected void update() { controller.tick(); }
+            @Override protected void render() { draw(); }
         };
     }
 
