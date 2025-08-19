@@ -80,6 +80,12 @@ public class GameView {
         Scene scene = new Scene(root, canvas.getWidth(), canvas.getHeight() + 40);    // added 40 to fit back button
         stage.setTitle("Tetris - Play");
 
+        //escape (askExitToMenu()) on screen close button
+        stage.setOnCloseRequest(evt -> {
+            evt.consume();
+            askExitToMenu();
+        });
+
         // Keyboard input handling
         scene.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
             switch (e.getCode()) {
