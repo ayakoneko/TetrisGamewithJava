@@ -30,7 +30,7 @@ public class Main extends Application {
     private static final double TITLE_SPACING = 40;
 
     @Override
-   public void start(Stage primaryStage){
+    public void start(Stage primaryStage){
         new SplashWindow().show(primaryStage, () -> showMainMenu(primaryStage));
     }
 
@@ -53,7 +53,6 @@ public class Main extends Application {
         Button playButton = createMenuButton("Play", () -> {
             primaryStage.hide();
 
-            //new Game().startGame(primaryStage);
             GameController controller = new GameController();
             GameView gameView = new GameView(primaryStage, controller);
             gameView.startGame();
