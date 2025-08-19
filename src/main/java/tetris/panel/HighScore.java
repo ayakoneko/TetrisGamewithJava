@@ -90,7 +90,7 @@ public class HighScore {
         stage.setScene(scene);
         stage.setTitle("High Scores");
 
-        stage.setOnCloseRequest(evt -> {                            // ✅ CHANGED: ✕ behaves like Back
+        stage.setOnCloseRequest(evt -> {
             evt.consume();
             new tetris.Main().showMainMenu(stage);
         });
