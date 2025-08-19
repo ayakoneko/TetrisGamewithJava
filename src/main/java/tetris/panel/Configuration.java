@@ -23,9 +23,7 @@ public class Configuration {
     private static final double CONTROL_SPACING = 8;
     private static final double SLIDER_WIDTH = 400; // Increased slider width
 
-    public void startConfig(Stage mainStage) {
-        Stage configStage = new Stage(); // New page
-
+    public void startConfig(Stage stage) {
         VBox layout = new VBox(SECTION_SPACING);
         layout.setPadding(new Insets(20));
         layout.setAlignment(Pos.TOP_CENTER);
@@ -127,10 +125,7 @@ public class Configuration {
 
         // Button to return to Main Menu
         Button button_back = createStyledButton("Back");
-        button_back.setOnAction(event -> {
-            configStage.close();
-            mainStage.show();
-        });
+        button_back.setOnAction(e -> new tetris.Main().showMainMenu(stage));
 
         layout.getChildren().addAll(title, slidersBox, checkboxBox, button_back);
 
@@ -142,9 +137,15 @@ public class Configuration {
         );
 
         Scene scene = new Scene(root, 500, 600);
-        configStage.setScene(scene);
-        configStage.setTitle("Configuration");
-        configStage.show();
+        stage.setScene(scene);
+        stage.setTitle("Configuration");
+
+        stage.setOnCloseRequest(evt -> {
+            evt.consume();
+            new tetris.Main().showMainMenu(stage);
+        });
+
+        stage.show();
     }
 
     // Creates a styled label for form controls

@@ -1,7 +1,5 @@
 package tetris;
 
-import java.util.Optional;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -19,6 +17,8 @@ import tetris.panel.Configuration;
 import tetris.panel.GameView;
 import tetris.panel.HighScore;
 import tetris.panel.SplashWindow;
+
+import java.util.Optional;
 
 public class Main extends Application {
 
@@ -60,7 +60,6 @@ public class Main extends Application {
         });
 
         Button configButton = createMenuButton("Configuration", () -> {
-            primaryStage.hide();
             new Configuration().startConfig(primaryStage);
         });
 
@@ -70,6 +69,10 @@ public class Main extends Application {
         });
 
         Button exitButton = createMenuButton("Exit", this::showExitConfirmation);
+        primaryStage.setOnCloseRequest(evt -> {
+            evt.consume();
+            showExitConfirmation();
+        });
 
         // Author credit label
         Label authorLabel = new Label("Author: G11");
