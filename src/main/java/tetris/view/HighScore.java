@@ -1,4 +1,4 @@
-package tetris.panel;
+package tetris.view;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -16,6 +16,11 @@ public class HighScore {
     private static final double BUTTON_HEIGHT = 50;
     private static final double SCORE_SPACING = 12;
     private static final double SECTION_SPACING = 30;
+
+    private final Runnable onBack;
+    public HighScore(Runnable onBack) {
+        this.onBack = onBack;
+    }
 
     public void startHighScore(Stage stage) {
         VBox layout = new VBox(SECTION_SPACING);
@@ -75,7 +80,10 @@ public class HighScore {
 
         // Button to return to Main Menu
         Button backButton = createStyledButton("Back");
-        backButton.setOnAction(e -> new tetris.Main().showMainMenu(stage));
+        backButton.setOnAction(e -> {
+            if (onBack != null) onBack.run();
+            else new tetris.Main().showMainMenu(stage);
+        });
 
         layout.getChildren().addAll(title, scoresContainer, backButton);
 
@@ -92,7 +100,8 @@ public class HighScore {
 
         stage.setOnCloseRequest(evt -> {
             evt.consume();
-            new tetris.Main().showMainMenu(stage);
+            if (onBack != null) onBack.run();
+            else new tetris.Main().showMainMenu(stage);
         });
 
         stage.show();

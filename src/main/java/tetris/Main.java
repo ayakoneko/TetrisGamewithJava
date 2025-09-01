@@ -12,11 +12,13 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import tetris.controller.GameController;
-import tetris.panel.Configuration;
-import tetris.panel.GameView;
-import tetris.panel.HighScore;
-import tetris.panel.SplashWindow;
+import tetris.controller.game.GameController;
+import tetris.model.GameBoard;
+import tetris.view.Configuration;
+import tetris.view.GameView;
+import tetris.view.HighScore;
+import tetris.view.SplashWindow;
+import tetris.setting.GameSetting;
 
 import java.util.Optional;
 
@@ -28,6 +30,8 @@ public class Main extends Application {
     private static final double MENU_PADDING = 60;
     private static final double MENU_SPACING = 20;
     private static final double TITLE_SPACING = 40;
+
+    private final GameSetting settings = new GameSetting();
 
     @Override
     public void start(Stage primaryStage){
@@ -53,18 +57,31 @@ public class Main extends Application {
         Button playButton = createMenuButton("Play", () -> {
             primaryStage.hide();
 
-            GameController controller = new GameController();
-            GameView gameView = new GameView(primaryStage, controller);
+            // Build board from setting
+            GameController controller = new GameController(
+                    new GameBoard(settings.getFieldWidth(), settings.getFieldHeight())
+            );
+
+            //Pass a "back to menu" callback
+            GameView gameView = new GameView(primaryStage, controller, settings,
+                    () -> showMainMenu(primaryStage)
+            );
             gameView.startGame();
         });
 
         Button configButton = createMenuButton("Configuration", () -> {
-            new Configuration().startConfig(primaryStage);
+            //pass settings + a "back to menu" callback
+            new Configuration(settings,
+                    () -> showMainMenu(primaryStage)
+            ).startConfig(primaryStage);
         });
 
         Button highScoreButton = createMenuButton("High Score", () -> {
             primaryStage.hide();
-            new HighScore().startHighScore(primaryStage);
+            //Pass a "back to menu" callback
+            new HighScore(
+                    () -> showMainMenu(primaryStage)
+            ).startHighScore(primaryStage);
         });
 
         Button exitButton = createMenuButton("Exit", this::showExitConfirmation);

@@ -1,4 +1,4 @@
-package tetris.panel;
+package tetris.view;
 
 import javafx.animation.PauseTransition;
 import javafx.geometry.Pos;

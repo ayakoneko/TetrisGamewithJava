@@ -1,12 +1,14 @@
-package tetris.panel;
+package tetris.view;
 
 import javafx.animation.AnimationTimer;
 
 public abstract class GameLoop extends AnimationTimer {
-    private final long intervalNanos;
+    private long intervalNanos;
     private long lastUpdate = 0;
 
-    protected GameLoop(long intervalNanos) {
+    protected GameLoop(long intervalNanos) {this.intervalNanos = intervalNanos;}
+    public long getIntervalNanos() {return intervalNanos;}
+    public void setIntervalNanos(long intervalNanos) {
         this.intervalNanos = intervalNanos;
     }
 
