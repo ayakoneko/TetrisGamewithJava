@@ -1,5 +1,7 @@
 package tetris.view;
 
+import java.net.URL;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -7,11 +9,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import tetris.setting.GameSetting;
-
-import java.net.URL;
 
 public class Configuration {
 
@@ -25,10 +29,10 @@ public class Configuration {
     private final GameSetting settings;
     private final Runnable onBack;
 
-    //a navigation callback
+    // a navigation callback
     public Configuration(GameSetting settings, Runnable onBack) {
         this.settings = settings;
-        this.onBack   = onBack;
+        this.onBack = onBack;
     }
 
     private static long levelToMs(int level) {
@@ -117,7 +121,8 @@ public class Configuration {
 
         Scene scene = new Scene(root, 500, 600);
 
-        URL css = getClass().getResource("/Configuration.css");
+        // Apply external style sheet from shared Style.css
+        URL css = getClass().getResource("/css/Style.css");
         if (css != null) {
             scene.getStylesheets().add(css.toExternalForm());
         } else {

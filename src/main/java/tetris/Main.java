@@ -1,5 +1,7 @@
 package tetris;
 
+import java.util.Optional;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -14,13 +16,11 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import tetris.controller.game.GameController;
 import tetris.model.GameBoard;
+import tetris.setting.GameSetting;
 import tetris.view.Configuration;
 import tetris.view.GameView;
 import tetris.view.HighScore;
 import tetris.view.SplashWindow;
-import tetris.setting.GameSetting;
-
-import java.util.Optional;
 
 public class Main extends Application {
 
@@ -45,13 +45,7 @@ public class Main extends Application {
 
         // Main title of the game
         Label titleLabel = new Label("TETRIS GAME");
-        titleLabel.setStyle(
-            "-fx-font-family: 'Arial Black', 'Arial', sans-serif;" +
-            "-fx-font-size: 36px;" +
-            "-fx-font-weight: bold;" +
-            "-fx-text-fill: linear-gradient(to right, #4FC3F7, #29B6F6);" +
-            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 4, 0, 2, 2);"
-        );
+        titleLabel.getStyleClass().add("label-title");
 
         // Navigation buttons
         Button playButton = createMenuButton("Play", () -> {
@@ -112,11 +106,12 @@ public class Main extends Application {
 
         // Main background container
         StackPane rootPane = new StackPane(menuLayout);
-        rootPane.setStyle(
-            "-fx-background-color: linear-gradient(to bottom, #263238, #37474F);"
-        );
-        
+        rootPane.getStyleClass().add("main-background");
+
         Scene mainScene = new Scene(rootPane, 500, 650);
+
+        // Apply shared stylesheet
+        mainScene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
 
         primaryStage.setScene(mainScene);
         primaryStage.setTitle("Tetris Game");
@@ -128,78 +123,7 @@ public class Main extends Application {
         Button button = new Button(text);
         button.setPrefWidth(BUTTON_WIDTH);
         button.setPrefHeight(BUTTON_HEIGHT);
-        
-        // Base button styling
-        button.setStyle(
-            "-fx-font-family: 'Arial', sans-serif;" +
-            "-fx-font-size: 16px;" +
-            "-fx-font-weight: bold;" +
-            "-fx-text-fill: white;" +
-            "-fx-background-color: linear-gradient(to bottom, #546E7A, #455A64);" +
-            "-fx-background-radius: 8;" +
-            "-fx-border-radius: 8;" +
-            "-fx-border-color: #78909C;" +
-            "-fx-border-width: 1;" +
-            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 3, 0, 1, 1);" +
-            "-fx-cursor: hand;"
-        );
-        
-        // Button hover effects
-        button.setOnMouseEntered(e -> {
-            button.setStyle(
-                "-fx-font-family: 'Arial', sans-serif;" +
-                "-fx-font-size: 16px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-text-fill: white;" +
-                "-fx-background-color: linear-gradient(to bottom, #607D8B, #546E7A);" +
-                "-fx-background-radius: 8;" +
-                "-fx-border-radius: 8;" +
-                "-fx-border-color: #90A4AE;" +
-                "-fx-border-width: 2;" +
-                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 5, 0, 2, 2);" +
-                "-fx-cursor: hand;" +
-                "-fx-scale-x: 1.02;" +
-                "-fx-scale-y: 1.02;"
-            );
-        });
-        
-        button.setOnMouseExited(e -> {
-            button.setStyle(
-                "-fx-font-family: 'Arial', sans-serif;" +
-                "-fx-font-size: 16px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-text-fill: white;" +
-                "-fx-background-color: linear-gradient(to bottom, #546E7A, #455A64);" +
-                "-fx-background-radius: 8;" +
-                "-fx-border-radius: 8;" +
-                "-fx-border-color: #78909C;" +
-                "-fx-border-width: 1;" +
-                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 3, 0, 1, 1);" +
-                "-fx-cursor: hand;" +
-                "-fx-scale-x: 1.0;" +
-                "-fx-scale-y: 1.0;"
-            );
-        });
-        
-        // Button press effects
-        button.setOnMousePressed(e -> {
-            button.setStyle(
-                "-fx-font-family: 'Arial', sans-serif;" +
-                "-fx-font-size: 16px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-text-fill: white;" +
-                "-fx-background-color: linear-gradient(to bottom, #455A64, #37474F);" +
-                "-fx-background-radius: 8;" +
-                "-fx-border-radius: 8;" +
-                "-fx-border-color: #607D8B;" +
-                "-fx-border-width: 2;" +
-                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 1, 0, 0, 0);" +
-                "-fx-cursor: hand;" +
-                "-fx-scale-x: 0.98;" +
-                "-fx-scale-y: 0.98;"
-            );
-        });
-        
+        button.getStyleClass().add("styled-button");
         button.setOnAction(e -> action.run());
         return button;
     }
