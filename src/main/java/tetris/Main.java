@@ -1,7 +1,5 @@
 package tetris;
 
-import java.util.Optional;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -16,11 +14,14 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import tetris.controller.game.GameController;
 import tetris.model.GameBoard;
+import tetris.setting.ConfigManager;
 import tetris.setting.GameSetting;
 import tetris.view.Configuration;
 import tetris.view.GameView;
 import tetris.view.HighScore;
 import tetris.view.SplashWindow;
+
+import java.util.Optional;
 
 public class Main extends Application {
 
@@ -31,7 +32,8 @@ public class Main extends Application {
     private static final double MENU_SPACING = 20;
     private static final double TITLE_SPACING = 40;
 
-    private final GameSetting settings = new GameSetting();
+    //private final GameSetting settings = new GameSetting();
+    private final GameSetting settings = ConfigManager.loadOrDefault();
 
     @Override
     public void start(Stage primaryStage){
@@ -129,6 +131,7 @@ public class Main extends Application {
     }
 
     // Shows a confirmation dialog before exiting the application.
+
     private void showExitConfirmation() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Exit Confirmation");
@@ -136,9 +139,11 @@ public class Main extends Application {
         alert.setContentText("Are you sure you want to exit the game?");
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
+            ConfigManager.save(settings);
             Platform.exit();
         }
     }
+
 
     public static void main(String[] args) {
         launch(args);

@@ -1,0 +1,9 @@
+{
+  "fieldWidth" : 13,
+  "fieldHeight" : 27,
+  "level" : 7,
+  "musicOn" : false,
+  "sfxOn" : false,
+  "aiOn" : false,
+  "extendOn" : true
+}
