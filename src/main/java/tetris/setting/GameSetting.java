@@ -14,6 +14,9 @@ public class GameSetting {
     private boolean aiOn     = false;
     private boolean extendOn = false;
 
+    private PlayerType playerOneType = PlayerType.HUMAN;
+    private PlayerType playerTwoType = PlayerType.HUMAN;
+
     public int  getFieldWidth()  { return fieldWidth; }
     public void setFieldWidth(int w)  { this.fieldWidth = w; }
 
@@ -34,5 +37,10 @@ public class GameSetting {
 
     public boolean isExtendOn()  { return extendOn; }
     public void setExtendOn(boolean v) { this.extendOn = v; }
-}
 
+    public PlayerType getPlayerOneType() { return playerOneType; }
+    public void setPlayerOneType(PlayerType t) { this.playerOneType = t; }
+
+    public PlayerType getPlayerTwoType() { return playerTwoType; }
+    public void setPlayerTwoType(PlayerType t) { this.playerTwoType = t; }
+}

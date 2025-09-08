@@ -11,11 +11,22 @@ public class GameController implements IGameController {
     private final IGameBoard board;
     private PlayState state = new PlayingState();
 
+    private int clearedLinesLastTick = 0;
+
     public GameController(IGameBoard board) {this.board = board;}
 
     public void setState(PlayState next) { this.state = next; }
     public PlayState getState() { return state; }
 
+    public int getAndResetClearedLines() {
+        int v = clearedLinesLastTick;
+        clearedLinesLastTick = 0;
+        return v;
+    }
+
+    public void setClearedLinesLastTick(int cleared) {
+        this.clearedLinesLastTick = cleared;
+    }
 
     @Override public IGameBoard board() {return board;}
     @Override public GameState state() {return state.uiState();}

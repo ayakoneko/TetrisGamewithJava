@@ -20,7 +20,10 @@ public class PlayingState implements PlayState {
                 c.setState(new GameOverState());
                 return;
             }
-            b.clearFullLines();
+            // ★ 지워진 줄 수를 반환받는다
+            int cleared = b.clearFullLines();     // ← int 반환으로 변경
+            c.setClearedLinesLastTick(cleared);   // ★ 컨트롤러에 기록
+
             if (!b.newPiece()) c.setState(new GameOverState());
         }
     }
@@ -33,7 +36,9 @@ public class PlayingState implements PlayState {
             case SOFT_DROP  -> b.softDropStep();
             case HARD_DROP  -> {
                 b.hardDrop();
-                b.clearFullLines();
+                // ★ 하드드랍 후 라인 삭제 개수 기록
+                int cleared = b.clearFullLines();   // ← int 반환
+                c.setClearedLinesLastTick(cleared);
                 if (!b.newPiece()) c.setState(new GameOverState());
             }
             case ROTATE_CW  -> b.rotateCW();

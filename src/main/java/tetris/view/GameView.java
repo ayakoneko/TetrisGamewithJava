@@ -18,14 +18,16 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import tetris.common.Action;
 import tetris.common.GameState;
+import tetris.common.AudioManager;
 import tetris.controller.game.GameController;
 import tetris.model.Tetromino;
+import tetris.setting.ConfigManager;
 import tetris.setting.GameSetting;
 
 import java.util.Optional;
 
 /**
-* GameView : connecting user input and the game logic (GameController) to the on-screen rendering.
+ * GameView : connecting user input and the game logic (GameController) to the on-screen rendering.
  * startGame() : Set Scene, key event handler, play game
  * togglePause() : Change game state (Play / Pause)
  * askExitToMenu() : back button or Press Escape
@@ -34,7 +36,8 @@ import java.util.Optional;
  * drawCell() : draw each cell
  * drawCenteredOverlay() : Show message(paused, game over)
  * colorOf : Define the color of blocks
-*/
+ */
+
 public class GameView {
 
     // === UI constants ===
@@ -44,6 +47,7 @@ public class GameView {
 
     private final Stage stage;
     private final GameController controller;
+    private final GameSetting setting;
     private final Canvas canvas;
     private final GameLoop loop;
     private final Runnable onExitToMenu;
@@ -62,6 +66,7 @@ public class GameView {
     public GameView(Stage stage, GameController controller, GameSetting setting, Runnable onExitToMenu) {
         this.stage = stage;
         this.controller = controller;
+        this.setting = setting;
         this.onExitToMenu = onExitToMenu;
 
         // Canvas size based on board dimensions (dynamic)
@@ -72,7 +77,15 @@ public class GameView {
         // Game loop: Every drop interval (default 500ms) → controller.tick() → draw()
         long interval = intervalForLevel(setting.getLevel());
         this.loop = new GameLoop(interval) {
-            @Override protected void update() { controller.tick(); }
+            @Override protected void update() {
+                controller.tick();
+
+
+                int cleared = controller.getAndResetClearedLines();
+                if (cleared > 0 && setting.isSfxOn()) {
+                    AudioManager.playSfx("erase-line.wav");
+                }
+            }
             @Override protected void render() { draw(); }
         };
     }
@@ -111,6 +124,13 @@ public class GameView {
 
             if (action != null) {
                 controller.handle(action);
+
+                if (setting.isSfxOn()) {
+                    if (action == Action.MOVE_LEFT || action == Action.MOVE_RIGHT || action == Action.ROTATE_CW) {
+                        AudioManager.playSfx("move-turn.wav");
+                    }
+                }
+
                 draw();
                 e.consume();
                 return;
@@ -124,6 +144,18 @@ public class GameView {
                         loop.start();
                         draw();
                     }
+                }
+                case M -> {
+                    boolean playingNow = AudioManager.toggleBGM("background.mp3", true);
+                    setting.setMusicOn(playingNow);
+                    ConfigManager.save(setting);
+                    draw();
+                }
+                case S -> {
+                    boolean newVal = !setting.isSfxOn();
+                    setting.setSfxOn(newVal);
+                    ConfigManager.save(setting);
+                    draw();
                 }
                 case ESCAPE -> askExitToMenu();
                 default -> { /* ignore */ }
@@ -139,6 +171,13 @@ public class GameView {
         stage.setScene(buildScreen());
         controller.start();
         stage.show();
+
+        if (setting.isMusicOn()) {
+            AudioManager.playBGM("background.mp3", true);
+        } else {
+            AudioManager.stopBGM();
+        }
+
         loop.start();
         draw();
     }
@@ -173,6 +212,7 @@ public class GameView {
         if (result.isPresent() && result.get() == ButtonType.OK) {
             loop.stop();
             controller.reset();
+            AudioManager.stopBGM();
             onExitToMenu.run();
         } else {                // Press Exit -> select No
             if (wasPlaying) {   // Press Exit While playing game
@@ -214,6 +254,8 @@ public class GameView {
             }
             default -> { /* PLAY: no overlay */ }
         }
+
+        drawHud(g);
     }
 
     // Draws both fixed cells and the current tetromino.
@@ -300,5 +342,25 @@ public class GameView {
             case 7 -> Color.ORANGE;      // L
             default -> Color.TRANSPARENT;
         };
+    }
+
+    private void drawHud(GraphicsContext g) {
+        String musicTxt = setting.isMusicOn() ? "On" : "Off";
+        String sfxTxt   = setting.isSfxOn()   ? "On" : "Off";
+        String label    = "Music [M]: " + musicTxt + "    SFX [S]: " + sfxTxt;
+
+        double pad = PADDING;
+        double x = pad, y = 6;
+        double w = canvas.getWidth() - pad * 2;
+        double h = 24;
+
+        g.setFill(Color.rgb(0, 0, 0, 0.35));
+        g.fillRoundRect(x, y, w, h, 10, 10);
+
+        g.setFill(Color.WHITE);
+        g.setFont(Font.font("Arial", 14));
+        g.setTextAlign(TextAlignment.CENTER);
+        g.setTextBaseline(VPos.TOP);
+        g.fillText(label, canvas.getWidth() / 2, y + 4);
     }
 }
