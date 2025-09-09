@@ -1,4 +1,4 @@
-package tetris.score;
+package tetris.model.score;
 
 import java.util.ArrayList;
 import java.util.List;

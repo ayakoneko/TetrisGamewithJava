@@ -11,7 +11,8 @@ public class GameOverState implements PlayState {
     @Override public void togglePause(GameController c) { /* no-op */ }
     @Override public void restart(GameController c) {
         c.board().reset();
-        c.setState(new PlayingState());
+        // Restore the correct player type state
+        c.setPlayerType(c.getPlayerType()); // This recreates the appropriate state
         c.getState().start(c);
     }
     @Override public void reset(GameController c) { c.board().reset(); }

@@ -1,5 +1,6 @@
 package tetris.model;
 
+import tetris.util.BoardUtils;
 import java.util.Random;
 
 public class GameBoard implements IGameBoard {
@@ -36,25 +37,8 @@ public class GameBoard implements IGameBoard {
 
     @Override
     public boolean canMove(Tetromino t, int dx, int dy, int newRot){
-        int[][] s = t.type.rot[newRot];
-        for (int r=0;r<4;r++){
-            for (int c=0;c<4;c++){
-                if (s[r][c]==0) continue;
-                int nx = t.x() + c + dx;
-                int ny = t.y() + r + dy;
-
-                // Check left, right end and bottom
-                if (nx < 0 || nx >= width) return false;
-                if (ny >= height) return false;
-
-                // Allow blocks to start point
-                if (ny < 0) continue;
-
-                // Board and cell collision
-                if (board[ny][nx] != 0) return false;
-            }
-        }
-        return true;
+        // Delegate to centralized utility - single source of truth for collision logic
+        return BoardUtils.canMovePiece(board, t, dx, dy, newRot);
     }
 
     @Override
@@ -88,46 +72,43 @@ public class GameBoard implements IGameBoard {
     @Override
     public void hardDrop() {
         if (current == null) return;
+        // Drop piece to bottom position - let game state handle locking
         while (canMove(current, 0, 1, current.rot)) current.moveBy(0,1);
-        lockCurrent();
+        // Don't lock here - let the game state handle locking and line clearing consistently
     }
 
     /** Locks the current tetromino into the board grid */
     @Override
     public boolean lockCurrent(){
         if (current==null) return false;
+        
+        // Check for overflow before locking (any part above board)
         boolean overflow = false;
         int[][] s = current.shape();
         for (int r=0;r<4;r++){
             for (int c=0;c<4;c++){
                 if (s[r][c]==0) continue;
-                int bx = current.x() + c, by = current.y() + r;
-                if (by < 0) { overflow = true; continue; }
-                if (by < height && bx >= 0 && bx < width) board[by][bx] = current.colorId();
+                int by = current.y() + r;
+                if (by < 0) { 
+                    overflow = true; 
+                    break; 
+                }
             }
+            if (overflow) break;
         }
+        
+        // Use centralized locking logic
+        BoardUtils.lockPieceIntoBoard(board, current);
         current = null;
+        
         return !overflow;
     }
 
     /** Removes full lines from the board and shifts lines above down */
     @Override
     public int clearFullLines(){
-        int write = height-1, cleared = 0;
-        for (int read = height-1; read>=0; read--){
-            boolean full = true;
-            for (int x=0;x<width;x++){ if (board[read][x]==0){ full=false; break; } }
-            if (!full){
-                if (write != read) System.arraycopy(board[read],0,board[write],0,width);
-                write--;
-            } else {
-                cleared++;
-            }
-        }
-        for (int y=write; y>=0; y--){
-            for (int x=0;x<width;x++) board[y][x]=0;
-        }
-        return cleared;
+        // Delegate to centralized utility - single source of truth for line clearing
+        return BoardUtils.clearFullLines(board);
     }
 
     /** Game Restart */

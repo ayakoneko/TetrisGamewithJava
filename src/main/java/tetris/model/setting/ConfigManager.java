@@ -1,4 +1,4 @@
-package tetris.setting;
+package tetris.model.setting;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -43,7 +43,7 @@ public final class ConfigManager {
                     ", L=" + s.getLevel() +
                     ", music=" + s.isMusicOn() +
                     ", sfx=" + s.isSfxOn() +
-                    ", ai=" + s.isAiOn() +
+                    ", player1=" + s.getPlayerOneType() +
                     ", extend=" + s.isExtendOn());
         } catch (Exception e) {
             System.err.println("[Config] save error: " + e.getMessage());

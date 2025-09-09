@@ -1,4 +1,4 @@
-package tetris.setting;
+package tetris.model.setting;
 
 public class GameSetting {
     public static final int DEFAULT_W = 10;
@@ -11,7 +11,6 @@ public class GameSetting {
 
     private boolean musicOn  = true;
     private boolean sfxOn    = true;
-    private boolean aiOn     = false;
     private boolean extendOn = false;
 
     private PlayerType playerOneType = PlayerType.HUMAN;
@@ -32,8 +31,6 @@ public class GameSetting {
     public boolean isSfxOn()     { return sfxOn; }
     public void setSfxOn(boolean v) { this.sfxOn = v; }
 
-    public boolean isAiOn()      { return aiOn; }
-    public void setAiOn(boolean v) { this.aiOn = v; }
 
     public boolean isExtendOn()  { return extendOn; }
     public void setExtendOn(boolean v) { this.extendOn = v; }
@@ -43,4 +40,12 @@ public class GameSetting {
 
     public PlayerType getPlayerTwoType() { return playerTwoType; }
     public void setPlayerTwoType(PlayerType t) { this.playerTwoType = t; }
+
+    // Game speed calculation based on level
+    public long calculateDropInterval() {
+        long base = 700_000_000L;          // 700ms
+        long step = 50_000_000L;           // 50ms per level
+        int lvl = Math.max(1, Math.min(level, 10)); // clamp between Level 1–10
+        return base - ((long)(lvl - 1) * step);
+    }
 }

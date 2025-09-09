@@ -20,9 +20,9 @@ public class PlayingState implements PlayState {
                 c.setState(new GameOverState());
                 return;
             }
-            // ★ 지워진 줄 수를 반환받는다
-            int cleared = b.clearFullLines();     // ← int 반환으로 변경
-            c.setClearedLinesLastTick(cleared);   // ★ 컨트롤러에 기록
+            // Clear full lines and record count for scoring
+            int cleared = b.clearFullLines();
+            c.setClearedLinesLastTick(cleared);
 
             if (!b.newPiece()) c.setState(new GameOverState());
         }
@@ -35,9 +35,13 @@ public class PlayingState implements PlayState {
             case MOVE_RIGHT -> b.moveRight();
             case SOFT_DROP  -> b.softDropStep();
             case HARD_DROP  -> {
-                b.hardDrop();
-                // ★ 하드드랍 후 라인 삭제 개수 기록
-                int cleared = b.clearFullLines();   // ← int 반환
+                b.hardDrop(); // Drop piece to bottom
+                // Now handle locking and line clearing consistently with normal tick
+                if (!b.lockCurrent()) {
+                    c.setState(new GameOverState());
+                    return;
+                }
+                int cleared = b.clearFullLines();
                 c.setClearedLinesLastTick(cleared);
                 if (!b.newPiece()) c.setState(new GameOverState());
             }
@@ -45,7 +49,7 @@ public class PlayingState implements PlayState {
         }
     }
 
-    @Override public void togglePause(GameController c) { c.setState(new PausedState()); }
+    @Override public void togglePause(GameController c) { c.setState(new PausedState(this)); }
     @Override public void restart(GameController c) { c.setState(new PlayingState()); c.board().reset(); start(c); }
     @Override public void reset(GameController c) { c.board().reset(); }  // keep playing after reset
     @Override public GameState uiState() { return GameState.PLAY; }

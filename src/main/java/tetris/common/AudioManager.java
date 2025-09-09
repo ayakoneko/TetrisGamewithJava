@@ -28,7 +28,7 @@ public class AudioManager {
     public static void playBGM(String filename, boolean loop) {
         ensureLoaded(filename, loop);
         if (bgmPlayer != null) {
-            bgmPlayer.play();  // pause면 이어서, stop/ready면 처음부터
+            bgmPlayer.play();  // Resume from pause or start from beginning
         }
     }
 

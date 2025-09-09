@@ -3,20 +3,11 @@ package tetris.view;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.Slider;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import tetris.setting.ConfigManager;
-import tetris.setting.GameSetting;
-import tetris.setting.PlayerType;
-
-import java.net.URL;
-import java.util.function.Consumer;
+import tetris.controller.config.ConfigurationController;
+import tetris.dto.GameSettingsData;
 
 import java.net.URL;
 import java.util.function.Consumer;
@@ -30,12 +21,15 @@ public class Configuration {
     private static final double CONTROL_SPACING = 8;
     private static final double SLIDER_WIDTH = 400;
 
-    private final GameSetting settings;
+    private final ConfigurationController configController;
+    private final GameSettingsData settingsData; // UI-safe DTO access
     private final Runnable onBack;
 
     private HBox playerTwoRow;
-    public Configuration(GameSetting settings, Runnable onBack) {
-        this.settings = settings;
+
+    public Configuration(ConfigurationController configController, Runnable onBack) {
+        this.configController = configController;
+        this.settingsData = configController.getSettingsData(); // UI-safe DTO access
         this.onBack = onBack;
     }
 
@@ -58,37 +52,34 @@ public class Configuration {
 
         // Field width
         Label widthLabel = createFieldLabel("Field Width (No of cells):");
-        Slider widthSlider = createStyledSlider(5, 15, settings.getFieldWidth());
+        Slider widthSlider = createStyledSlider(5, 15, settingsData.fieldWidth());
         Label widthValueLabel = createValueLabel(widthSlider.getValue());
         widthSlider.valueProperty().addListener((obs, o, v) -> {
             int val = v.intValue();
             widthValueLabel.setText(String.format("%.0f", v));
-            settings.setFieldWidth(val);
-            ConfigManager.save(settings);
+            configController.updateFieldWidth(val);
         });
         HBox widthControlBox = row(widthSlider, widthValueLabel);
 
         // Field height
         Label heightLabel = createFieldLabel("Field Height (No of cells):");
-        Slider heightSlider = createStyledSlider(15, 30, settings.getFieldHeight());
+        Slider heightSlider = createStyledSlider(15, 30, settingsData.fieldHeight());
         Label heightValueLabel = createValueLabel(heightSlider.getValue());
         heightSlider.valueProperty().addListener((obs, o, v) -> {
             int val = v.intValue();
             heightValueLabel.setText(String.format("%.0f", v));
-            settings.setFieldHeight(val);
-            ConfigManager.save(settings);
+            configController.updateFieldHeight(val);
         });
         HBox heightControlBox = row(heightSlider, heightValueLabel);
 
         // Level
         Label levelLabel = createFieldLabel("Game Level:");
-        Slider levelSlider = createStyledSlider(1, 10, settings.getLevel());
+        Slider levelSlider = createStyledSlider(1, 10, settingsData.level());
         Label levelValueLabel = createValueLabel(levelSlider.getValue());
         levelSlider.valueProperty().addListener((obs, o, v) -> {
             int val = v.intValue();
             levelValueLabel.setText(String.format("%.0f", v));
-            settings.setLevel(val);
-            ConfigManager.save(settings);
+            configController.updateLevel(val);
         });
         HBox levelControlBox = row(levelSlider, levelValueLabel);
 
@@ -107,16 +98,15 @@ public class Configuration {
         Label optionsTitle = new Label("Game Options");
         optionsTitle.getStyleClass().add("label-section");
 
-        HBox musicControlBox  = makeToggle("Music", settings.isMusicOn(),
-                isSel -> { settings.setMusicOn(isSel); ConfigManager.save(settings); });
+        HBox musicControlBox = makeToggle("Music", settingsData.musicOn(),
+                isSel -> configController.updateMusicSetting(isSel));
 
-        HBox soundControlBox  = makeToggle("Sound Effect", settings.isSfxOn(),
-                isSel -> { settings.setSfxOn(isSel); ConfigManager.save(settings); });
+        HBox soundControlBox = makeToggle("Sound Effect", settingsData.sfxOn(),
+                isSel -> configController.updateSfxSetting(isSel));
 
-        HBox extendControlBox = makeToggle("Extend Mode", settings.isExtendOn(),
+        HBox extendControlBox = makeToggle("Extend Mode", settingsData.extendOn(),
                 isSel -> {
-                    settings.setExtendOn(isSel);
-                    ConfigManager.save(settings);
+                    configController.updateExtendSetting(isSel);
                     if (playerTwoRow != null) playerTwoRow.setDisable(!isSel);
                 });
 
@@ -134,15 +124,15 @@ public class Configuration {
 
         HBox playerOneRow = buildPlayerTypeRow(
                 "Player One Type:",
-                settings.getPlayerOneType(),
-                pt -> { settings.setPlayerOneType(pt); ConfigManager.save(settings); }
+                settingsData.playerOneType(),
+                ptString -> configController.updatePlayerOneType(ptString)
         );
         playerTwoRow = buildPlayerTypeRow(
                 "Player Two Type:",
-                settings.getPlayerTwoType(),
-                pt -> { settings.setPlayerTwoType(pt); ConfigManager.save(settings); }
+                settingsData.playerTwoType(),
+                ptString -> configController.updatePlayerTwoType(ptString)
         );
-        playerTwoRow.setDisable(!settings.isExtendOn()); // Extend OFF이면 비활성화
+        playerTwoRow.setDisable(!settingsData.extendOn()); // Disable when extend mode is OFF
 
         playerTypeBox.getChildren().addAll(playerOptionsTitle, playerOneRow, playerTwoRow);
 
@@ -164,7 +154,10 @@ public class Configuration {
 
         stage.setScene(scene);
         stage.setTitle("Configuration");
-        stage.setOnCloseRequest(evt -> { evt.consume(); onBack.run(); });
+        stage.setOnCloseRequest(evt -> {
+            evt.consume();
+            onBack.run();
+        });
         stage.show();
     }
 
@@ -174,11 +167,13 @@ public class Configuration {
         label.getStyleClass().add("label-field");
         return label;
     }
+
     private Label createValueLabel(double initialValue) {
         Label label = new Label(String.format("%.0f", initialValue));
         label.getStyleClass().add("label-value");
         return label;
     }
+
     private Slider createStyledSlider(double min, double max, double value) {
         Slider slider = new Slider(min, max, value);
         slider.setShowTickLabels(true);
@@ -189,6 +184,7 @@ public class Configuration {
         slider.setPrefWidth(SLIDER_WIDTH);
         return slider;
     }
+
     private HBox row(Slider s, Label v) {
         HBox box = new HBox(CONTROL_SPACING);
         box.setAlignment(Pos.CENTER_LEFT);
@@ -225,16 +221,16 @@ public class Configuration {
         return controlBox;
     }
 
-    private HBox buildPlayerTypeRow(String labelText, PlayerType current, Consumer<PlayerType> onChange) {
+    private HBox buildPlayerTypeRow(String labelText, String currentType, Consumer<String> onChange) {
         HBox row = new HBox(CONTROL_SPACING);
         row.setAlignment(Pos.CENTER_LEFT);
 
         Label label = new Label(labelText);
         label.getStyleClass().add("label-field");
 
-        RadioButton rbHuman   = new RadioButton("Human   ");
-        RadioButton rbAI      = new RadioButton("AI   ");
-        RadioButton rbExternal= new RadioButton("External  ");
+        RadioButton rbHuman = new RadioButton("Human   ");
+        RadioButton rbAI = new RadioButton("AI   ");
+        RadioButton rbExternal = new RadioButton("External  ");
 
         rbHuman.getStyleClass().add("label-field");
         rbAI.getStyleClass().add("label-field");
@@ -245,18 +241,17 @@ public class Configuration {
         rbAI.setToggleGroup(tg);
         rbExternal.setToggleGroup(tg);
 
-        switch (current) {
-            case AI       -> rbAI.setSelected(true);
-            case EXTERNAL -> rbExternal.setSelected(true);
-            default       -> rbHuman.setSelected(true);
+        switch (currentType) {
+            case "AI" -> rbAI.setSelected(true);
+            case "EXTERNAL" -> rbExternal.setSelected(true);
+            default -> rbHuman.setSelected(true);
         }
 
         tg.selectedToggleProperty().addListener((obs, oldT, newT) -> {
             if (newT == null) return;
-            if (newT == rbHuman)      onChange.accept(PlayerType.HUMAN);
-            else if (newT == rbAI)    onChange.accept(PlayerType.AI);
-            else                      onChange.accept(PlayerType.EXTERNAL);
-            ConfigManager.save(settings);
+            if (newT == rbHuman) onChange.accept("HUMAN");
+            else if (newT == rbAI) onChange.accept("AI");
+            else onChange.accept("EXTERNAL");
         });
 
         Region spacer = new Region();

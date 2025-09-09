@@ -12,10 +12,12 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import tetris.controller.config.ConfigurationController;
+import tetris.controller.event.GameEventHandler;
 import tetris.controller.game.GameController;
-import tetris.model.GameBoard;
-import tetris.setting.ConfigManager;
-import tetris.setting.GameSetting;
+import tetris.factory.GameFactory;
+import tetris.model.setting.ConfigManager;
+import tetris.model.setting.GameSetting;
 import tetris.view.Configuration;
 import tetris.view.GameView;
 import tetris.view.HighScore;
@@ -32,7 +34,6 @@ public class Main extends Application {
     private static final double MENU_SPACING = 20;
     private static final double TITLE_SPACING = 40;
 
-    //private final GameSetting settings = new GameSetting();
     private final GameSetting settings = ConfigManager.loadOrDefault();
 
     @Override
@@ -53,31 +54,31 @@ public class Main extends Application {
         Button playButton = createMenuButton("Play", () -> {
             primaryStage.hide();
 
-            // Build board from setting
-            GameController controller = new GameController(
-                    new GameBoard(settings.getFieldWidth(), settings.getFieldHeight())
-            );
-
-            //Pass a "back to menu" callback
-            GameView gameView = new GameView(primaryStage, controller, settings,
+            // Create controllers and event handler using factory
+            GameController gameController = GameFactory.createGameController(settings);
+            GameEventHandler eventHandler = GameFactory.createGameEventHandler(gameController, settings);
+            GameView gameView = GameFactory.createGameView(primaryStage, eventHandler, settings,
                     () -> showMainMenu(primaryStage)
             );
             gameView.startGame();
         });
 
         Button configButton = createMenuButton("Configuration", () -> {
-            //pass settings + a "back to menu" callback
-            new Configuration(settings,
+            //Create configuration controller and view
+            ConfigurationController configController = GameFactory.createConfigurationController(settings);
+            Configuration config = GameFactory.createConfiguration(configController,
                     () -> showMainMenu(primaryStage)
-            ).startConfig(primaryStage);
+            );
+            config.startConfig(primaryStage);
         });
 
         Button highScoreButton = createMenuButton("High Score", () -> {
             primaryStage.hide();
             //Pass a "back to menu" callback
-            new HighScore(
+            HighScore highScore = GameFactory.createHighScore(
                     () -> showMainMenu(primaryStage)
-            ).startHighScore(primaryStage);
+            );
+            highScore.startHighScore(primaryStage);
         });
 
         Button exitButton = createMenuButton("Exit", this::showExitConfirmation);

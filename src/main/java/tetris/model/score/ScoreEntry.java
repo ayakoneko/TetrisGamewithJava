@@ -1,4 +1,4 @@
-package tetris.score;
+package tetris.model.score;
 
 public class ScoreEntry {
     // Player name
