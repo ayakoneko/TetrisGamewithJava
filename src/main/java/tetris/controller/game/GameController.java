@@ -3,11 +3,11 @@ package tetris.controller.game;
 import tetris.common.Action;
 import tetris.common.GameState;
 import tetris.controller.api.IGameController;
+import tetris.controller.score.ScoreController;
 import tetris.controller.state.AIPlayingState;
 import tetris.controller.state.PlayState;
 import tetris.controller.state.PlayingState;
 import tetris.model.IGameBoard;
-import tetris.controller.score.ScoreController;
 import tetris.model.setting.GameSetting;
 import tetris.model.setting.PlayerType;
 

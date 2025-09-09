@@ -1,5 +1,7 @@
 package tetris;
 
+import java.util.Optional;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -22,8 +24,6 @@ import tetris.view.Configuration;
 import tetris.view.GameView;
 import tetris.view.HighScore;
 import tetris.view.SplashWindow;
-
-import java.util.Optional;
 
 public class Main extends Application {
 
@@ -89,12 +89,7 @@ public class Main extends Application {
 
         // Author credit label
         Label authorLabel = new Label("Author: G11");
-        authorLabel.setStyle(
-            "-fx-font-family: 'Arial', sans-serif;" +
-            "-fx-font-size: 14px;" +
-            "-fx-text-fill: #B0BEC5;" +
-            "-fx-padding: 20 0 0 0;"
-        );
+        authorLabel.getStyleClass().add("label-author");
 
         // Layout containers for proper spacing
         VBox titleContainer = new VBox(TITLE_SPACING);

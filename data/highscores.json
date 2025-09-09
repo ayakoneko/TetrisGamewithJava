@@ -1,0 +1,10 @@
+[ {
+  "playerName" : "Player",
+  "score" : 7200
+}, {
+  "playerName" : "TestPlayer",
+  "score" : 7200
+}, {
+  "playerName" : "Player",
+  "score" : 600
+} ]

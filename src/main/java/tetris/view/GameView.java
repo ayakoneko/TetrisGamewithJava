@@ -1,5 +1,7 @@
 package tetris.view;
 
+import java.util.Optional;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
@@ -12,7 +14,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
@@ -22,8 +23,6 @@ import tetris.dto.GameSettingsData;
 import tetris.dto.GameStateData;
 import tetris.dto.TetrominoData;
 import tetris.viewmodel.GameViewModel;
-
-import java.util.Optional;
 
 /**
  * GameView : connecting user input and the game logic (GameController) to the on-screen rendering.
@@ -134,12 +133,11 @@ public class GameView {
             switch (e.getCode()) {
                 case P -> togglePause();
                 case R -> {
-                    GameStateData gameData = eventHandler.getGameStateData();
-                    if (gameData.gameState() == GameStateData.GameState.GAME_OVER) {
-                        eventHandler.restartGame();
-                        loop.start();
-                        draw();
-                    }
+                    // Save current score before restarting
+                    eventHandler.saveCurrentScore();
+                    eventHandler.restartGame();
+                    loop.start();
+                    draw();
                 }
                 case M -> {
                     eventHandler.toggleMusic();
@@ -202,6 +200,8 @@ public class GameView {
 
         if (result.isPresent() && result.get() == ButtonType.OK) {
             loop.stop();
+            // Save score before exiting to menu
+            eventHandler.saveCurrentScore();
             eventHandler.resetGame();
             eventHandler.stopBackgroundMusic();
             onExitToMenu.run();
@@ -321,7 +321,8 @@ public class GameView {
 
 
     private void drawHud(GraphicsContext g) {
-        String label = viewModel.formatHudText();
+        GameStateData gameData = eventHandler.getGameStateData();
+        String label = viewModel.formatHudText(gameData.currentScore());
 
         double pad = PADDING;
         double x = pad, y = 6;

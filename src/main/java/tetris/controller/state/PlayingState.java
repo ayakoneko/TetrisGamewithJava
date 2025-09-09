@@ -23,7 +23,6 @@ public class PlayingState implements PlayState {
             // Clear full lines and record count for scoring
             int cleared = b.clearFullLines();
             c.setClearedLinesLastTick(cleared);
-
             if (!b.newPiece()) c.setState(new GameOverState());
         }
     }

@@ -1,5 +1,7 @@
 package tetris.view;
 
+import java.util.List;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -8,6 +10,8 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import tetris.model.score.HighScoreManager;
+import tetris.model.score.ScoreEntry;
 
 public class HighScore {
 
@@ -32,21 +36,19 @@ public class HighScore {
         Label title = new Label("HIGH SCORES");
         title.getStyleClass().add("label-title");
 
-        // High score data entries
-        String[] dummyScores = {
-            "1. Homer - 1500", "2. Marge - 1400", "3. Bart - 1300", "4. Lisa - 1200",
-            "5. Maggie - 1100", "6. Ned Flanders - 1000", "7. Mr. Burns - 900",
-            "8. Moe Szyslak - 800", "9. Milhouse - 700", "10. Ralph Wiggum - 600"
-        };
+        // Get real score data from HighScoreManager
+        List<ScoreEntry> topScores = HighScoreManager.getInstance().getTopScores();
 
         // Container for score list display
         VBox scoresContainer = new VBox(SCORE_SPACING);
         scoresContainer.setAlignment(Pos.CENTER);
         scoresContainer.getStyleClass().add("box-score-list");
 
-        // Individual score entries with ranking-based styling
-        for (int i = 0; i < dummyScores.length; i++) {
-            Label scoreLabel = new Label(dummyScores[i]);
+        // Render actual high scores if available
+        for (int i = 0; i < topScores.size() && i < 10; i++) {
+            ScoreEntry entry = topScores.get(i);
+            String scoreText = String.format("%d. %s - %d", i + 1, entry.getPlayerName(), entry.getScore());
+            Label scoreLabel = new Label(scoreText);
 
             // Highlight top 3 scores with gold color
             if (i < 3) {
@@ -87,4 +89,4 @@ public class HighScore {
 
         stage.show();
     }
-} 
+}

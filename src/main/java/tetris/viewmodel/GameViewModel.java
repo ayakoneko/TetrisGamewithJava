@@ -43,11 +43,11 @@ public class GameViewModel {
         return base - ((long)(lvl - 1) * step);
     }
     
-    // Formats HUD text based on current settings
-    public String formatHudText() {
+    // Formats HUD text with score information
+    public String formatHudText(int currentScore) {
         String musicTxt = settings.musicOn() ? "On" : "Off";
         String sfxTxt   = settings.sfxOn()   ? "On" : "Off";
-        return "Music [M]: " + musicTxt + "    SFX [S]: " + sfxTxt;
+        return "Score: " + currentScore + "    Music [M]: " + musicTxt + "    SFX [S]: " + sfxTxt;
     }
     
     // Calculates canvas dimensions based on board size

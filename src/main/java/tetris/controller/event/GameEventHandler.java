@@ -4,8 +4,8 @@ import tetris.common.Action;
 import tetris.common.GameState;
 import tetris.controller.audio.AudioController;
 import tetris.controller.game.GameController;
-import tetris.dto.GameStateData;
 import tetris.dto.GameSettingsData;
+import tetris.dto.GameStateData;
 import tetris.dto.TetrominoData;
 import tetris.model.setting.ConfigManager;
 import tetris.model.setting.GameSetting;
@@ -130,6 +130,14 @@ public class GameEventHandler {
     
     public void stopBackgroundMusic() {
         audioController.stopBackgroundMusic();
+    }
+    
+    // Save current score to high score manager
+    public void saveCurrentScore() {
+        int currentScore = gameController.getCurrentScore();
+        if (currentScore > 0) {
+            gameController.submitFinalScore("Player");
+        }
     }
 
 }
