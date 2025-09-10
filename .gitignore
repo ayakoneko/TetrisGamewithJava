@@ -39,3 +39,5 @@ build/
 
 # Ignore JSON files used for local settings or scores
 /data/*.json
+# But keep the .keep file to maintain directory structure
+!/data/.keep

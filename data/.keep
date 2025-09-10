@@ -1,0 +1,3 @@
+# This file ensures the data directory is tracked by Git
+# The data directory structure is required for the application to function properly
+# Individual JSON files (config.json, highscores.json) are ignored but this directory must exist
