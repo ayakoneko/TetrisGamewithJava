@@ -49,4 +49,7 @@ public final class ConfigManager {
             System.err.println("[Config] save error: " + e.getMessage());
         }
     }
+
+    public static void clear() { }
+
 }
