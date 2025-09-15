@@ -137,14 +137,95 @@ public class GameView {
     // Keyboard input handling
     private void wireInput(Scene scene) {
         scene.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
-            Action action = switch (e.getCode()) {
-                case LEFT -> Action.MOVE_LEFT;
-                case RIGHT -> Action.MOVE_RIGHT;
-                case UP -> Action.ROTATE_CW;
-                case DOWN -> Action.SOFT_DROP;
-                case SPACE -> Action.HARD_DROP;
-                default -> null;
-            };
+            if (isTwoPlayer()) {
+                switch (e.getCode()) {
+                    case COMMA -> {
+                        if (!p1Handler.isAIActive()) {
+                            p1Handler.handlePlayerAction(Action.MOVE_LEFT);
+                            p1Handler.playMoveTurnSound();
+                            renderOnce();
+                        }
+                        e.consume();
+                    }
+                    case PERIOD -> {
+                        if (!p1Handler.isAIActive()) {
+                            p1Handler.handlePlayerAction(Action.MOVE_RIGHT);
+                            p1Handler.playMoveTurnSound();
+                            renderOnce();
+                        }
+                        e.consume();
+                    }
+                    case SPACE -> {
+                        if (!p1Handler.isAIActive()) {
+                            p1Handler.handlePlayerAction(Action.SOFT_DROP);
+                            renderOnce();
+                        }
+                        e.consume();
+                    }
+                    case L -> {
+                        if (!p1Handler.isAIActive()) {
+                            p1Handler.handlePlayerAction(Action.ROTATE_CW);
+                            p1Handler.playMoveTurnSound();
+                            renderOnce();
+                        }
+                        e.consume();
+                    }
+                    case LEFT -> {
+                        if (!p2Handler.isAIActive()) {
+                            p2Handler.handlePlayerAction(Action.MOVE_LEFT);
+                            p2Handler.playMoveTurnSound();
+                            renderOnce();
+                        }
+                        e.consume();
+                    }
+                    case RIGHT -> {
+                        if (!p2Handler.isAIActive()) {
+                            p2Handler.handlePlayerAction(Action.MOVE_RIGHT);
+                            p2Handler.playMoveTurnSound();
+                            renderOnce();
+                        }
+                        e.consume();
+                    }
+                    case DOWN -> {
+                        if (!p2Handler.isAIActive()) {
+                            p2Handler.handlePlayerAction(Action.SOFT_DROP);
+                            renderOnce();
+                        }
+                        e.consume();
+                    }
+                    case UP -> {
+                        if (!p2Handler.isAIActive()) {
+                            p2Handler.handlePlayerAction(Action.ROTATE_CW);
+                            p2Handler.playMoveTurnSound();
+                            renderOnce();
+                        }
+                        e.consume();
+                    }
+                    case P -> { togglePause(); e.consume(); }
+                    case R -> {
+                        p1Handler.saveCurrentScore();
+                        p1Handler.restartGame();
+                        p2Handler.saveCurrentScore();
+                        p2Handler.restartGame();
+                        loop.start();
+                        renderOnce();
+                        e.consume();
+                    }
+                    case M -> { p1Handler.toggleMusic(); renderOnce(); e.consume(); }
+                    case S -> { p1Handler.toggleSfx();   renderOnce(); e.consume(); }
+                    case ESCAPE -> { askExitToMenu(); e.consume(); }
+                    default -> {}
+                }
+
+            } else {
+                Action action = switch (e.getCode()) {
+                    case LEFT  -> Action.MOVE_LEFT;
+                    case RIGHT -> Action.MOVE_RIGHT;
+                    case UP    -> Action.ROTATE_CW;
+                    case DOWN  -> Action.SOFT_DROP;
+                    case SPACE -> Action.HARD_DROP;
+                    default -> null;
+                };
 
             // Block human input during AI mode
             if (action != null) {
@@ -158,25 +239,21 @@ public class GameView {
                 return;
             }
 
-            switch (e.getCode()) {
-                case P -> togglePause();
-                case R -> {
-                    // Save current score before restarting
-                    p1Handler.saveCurrentScore();
-                    p1Handler.restartGame();
-                    if (isTwoPlayer()) {
-                        p2Handler.saveCurrentScore();
-                        p2Handler.restartGame();
+                switch (e.getCode()) {
+                    case P -> togglePause();
+                    case R -> {
+                        p1Handler.saveCurrentScore();
+                        p1Handler.restartGame();
+                        loop.start();
+                        renderOnce();
                     }
-                    loop.start();
-                    renderOnce();
+                    case M -> { p1Handler.toggleMusic(); renderOnce(); }
+                    case S -> { p1Handler.toggleSfx();   renderOnce(); }
+                    case ESCAPE -> askExitToMenu();
+                    default -> {}
                 }
-                case M -> { p1Handler.toggleMusic(); renderOnce(); }
-                case S -> { p1Handler.toggleSfx(); renderOnce(); }
-                case ESCAPE -> askExitToMenu();
-                default -> {}
+                e.consume();
             }
-            e.consume();
         });
     }
 
@@ -314,7 +391,7 @@ public class GameView {
                     if (shape[r][c] == 0) continue;
                     int gx = current.x() + c;
                     int gy = current.y() + r;
-                    if (gy >= 0) {
+                    if (gx >= 0 && gx < BW && gy >= 0 && gy < BH) {
                         drawCell(g, bx, by, gx, gy, current.colorId());
                     }
                 }
@@ -335,6 +412,13 @@ public class GameView {
     private void drawCell(GraphicsContext g, double bx, double by, int x, int y, int id) {
         // Empty cell background
         GameViewModel.PixelPosition pos = viewModel.getBoardPixelPosition(x, y, bx, by, TILE);
+
+        if (pos == null) {
+            System.err.printf("drawCell(): null pos at (%d,%d) bx=%.1f by=%.1f TILE=%d%n",
+                    x, y, bx, by, TILE);
+            return;
+        }
+
         g.setFill(GameViewModel.EMPTY_CELL_COLOR);        // using GraphicsContext, set the color
         g.fillRect(pos.x, pos.y, TILE, TILE);            // filled each cell
 
@@ -361,20 +445,20 @@ public class GameView {
         String[] words = text.split(" ");
         StringBuilder line = new StringBuilder();
         for (String word : words) {
-            String candidate = (line.length() == 0) ? word : (line + " " + word);
+            String candidate = (line.isEmpty()) ? word : (line + " " + word);
             if (textWidth(candidate, font) <= maxWidth) {
                 line = new StringBuilder(candidate);
             } else {
-                if (line.length() == 0) {
-                    // single long token: put it alone to avoid infinite loop
-                    lines.add(word);
-                } else {
+                if (!line.isEmpty()) {
                     lines.add(line.toString());
                     line = new StringBuilder(word);
+                } else {
+                    // single long token: put it alone to avoid infinite loop
+                    lines.add(word);
                 }
             }
         }
-        if (line.length() > 0) lines.add(line.toString());
+        if (!line.isEmpty()) lines.add(line.toString());
         return lines;
     }
 

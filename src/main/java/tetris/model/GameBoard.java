@@ -1,18 +1,17 @@
 package tetris.model;
 
 import tetris.util.BoardUtils;
-import java.util.Random;
 
 public class GameBoard implements IGameBoard {
     private final int width, height;
     private final int[][] board;
-    private final Random rnd = new Random(); // create random block
     private Tetromino current; // Currently falling block
+    private final PieceGenerator generator;
 
-    // Gameboard Constructor with given width/height
-    public GameBoard(int width, int height) {
-        this.width  = width;
+    public GameBoard(int width, int height, PieceGenerator generator) {
+        this.width = width;
         this.height = height;
+        this.generator = generator;
         this.board  = new int[height][width];
     }
 
@@ -23,8 +22,13 @@ public class GameBoard implements IGameBoard {
 
     @Override
     public boolean newPiece() {
-        TetrominoType[] tt = TetrominoType.values();
-        TetrominoType t = tt[rnd.nextInt(tt.length)];
+        TetrominoType t;
+        if (generator != null) t = generator.next();
+        else {
+            TetrominoType[] tt = TetrominoType.values();
+            t = tt[java.util.concurrent.ThreadLocalRandom.current().nextInt(tt.length)];
+        }
+
         Tetromino next = new Tetromino(t, (width/2)-2, -2);
 
         if (!canMove(next, 0, 0, next.rot)) {
@@ -118,6 +122,5 @@ public class GameBoard implements IGameBoard {
             for (int x = 0; x < width; x++) board[y][x] = 0;
         }
         current = null;
-        newPiece();
     }
 }

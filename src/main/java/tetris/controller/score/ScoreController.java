@@ -1,7 +1,6 @@
 package tetris.controller.score;
 
 import tetris.model.score.HighScoreManager;
-import tetris.model.score.ScoreEntry;
 
 /**
  * ScoreController handles all scoring-related business logic and 
@@ -23,24 +22,26 @@ public class ScoreController {
         int basePoints = switch (linesCleared) {
             case 1 -> 100;   // Single
             case 2 -> 300;   // Double  
-            case 3 -> 500;   // Triple
-            case 4 -> 800;   // Tetris!
+            case 3 -> 600;   // Triple
+            case 4 -> 1000;  // Tetris!
             default -> 0;
         };
         
         int points = basePoints * level;
         currentScore += points;
     }
-    
+
+    /* Extra rule for score (soft/Hard drop)
     public void addSoftDropScore(int cellsDropped) {
         // 1 point per cell for soft drops
         currentScore += cellsDropped;
     }
-    
+
     public void addHardDropScore(int cellsDropped) {
-        // 2 points per cell for hard drops  
+        // 2 points per cell for hard drops
         currentScore += (cellsDropped * 2);
     }
+     */
     
     // Game end - record high score
     public boolean submitScore(String playerName) {

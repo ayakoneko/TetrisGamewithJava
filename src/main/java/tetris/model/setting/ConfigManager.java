@@ -45,6 +45,13 @@ public final class ConfigManager {
                     ", sfx=" + s.isSfxOn() +
                     ", player1=" + s.getPlayerOneType() +
                     ", extend=" + s.isExtendOn());
+
+            if (s.isExtendOn()){
+                System.out.println("[Config] 2Player Mode"+
+                        ", player1=" + s.getPlayerOneType() +
+                        ", player2=" + s.getPlayerTwoType() +
+                        ", level=" + s.getLevel());
+            }
         } catch (Exception e) {
             System.err.println("[Config] save error: " + e.getMessage());
         }

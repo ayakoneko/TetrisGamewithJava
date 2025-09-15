@@ -24,8 +24,6 @@ public class GameController implements IGameController {
     // Scoring system
     private final ScoreController scoreController = new ScoreController();
 
-    public GameController(IGameBoard board) {this.board = board;}
-    
     public GameController(IGameBoard board, GameSetting gameSetting, PlayerType playerType) {
         this.board = board;
         this.gameSetting = gameSetting;
@@ -83,12 +81,7 @@ public class GameController implements IGameController {
     public void setGameSetting(GameSetting gameSetting) { 
         this.gameSetting = gameSetting; 
     }
-    
-    // Scoring methods
-    public ScoreController getScoreController() {
-        return scoreController;
-    }
-    
+
     public int getCurrentScore() {
         return scoreController.getCurrentScore();
     }

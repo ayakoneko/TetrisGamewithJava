@@ -7,6 +7,7 @@ import tetris.controller.game.GameController;
 import tetris.controller.score.ScoreController;
 import tetris.dto.GameSettingsData;
 import tetris.model.GameBoard;
+import tetris.model.PieceGenerator;
 import tetris.model.setting.GameSetting;
 import tetris.model.setting.PlayerType;
 import tetris.view.Configuration;
@@ -16,15 +17,11 @@ import tetris.view.HighScore;
 public class GameFactory {
     
     // Creates a new GameController with the specified settings
-    public static GameController createGameController(GameSetting settings, PlayerType type) {
-        GameBoard board = new GameBoard(settings.getFieldWidth(), settings.getFieldHeight());
+    public static GameController createGameController(GameSetting settings,PlayerType type,PieceGenerator shared) {
+        GameBoard board = new GameBoard(settings.getFieldWidth(), settings.getFieldHeight(), shared);
         return new GameController(board, settings, type);
     }
 
-    public static GameController createGameController(GameSetting settings) {
-        return createGameController(settings, settings.getPlayerOneType());
-    }
-    
     // Creates a new ConfigurationController for settings management
     public static ConfigurationController createConfigurationController(GameSetting settings) {
         return new ConfigurationController(settings);
@@ -55,19 +52,23 @@ public class GameFactory {
     public static GameView createGameViewForSettings(Stage stage,
                                                      GameSetting settings,
                                                      Runnable onExitToMenu) {
-        // Player 1
-        GameController p1 = createGameController(settings, settings.getPlayerOneType());
-        GameEventHandler h1 = createGameEventHandler(p1, settings);
 
-        // If you’re using “Extend Mode” as 2-player flag:
-        boolean twoPlayers = settings.isExtendOn(); // or settings.getPlayers() == 2
+        if (settings.isExtendOn()) { // 2P
+            long seed = System.currentTimeMillis();
+            System.out.printf("[2P] seed=%d%n", seed);
+            PieceGenerator g1 = new PieceGenerator(seed);
+            PieceGenerator g2 = new PieceGenerator(seed);
 
-        if (twoPlayers) {
-            // Player 2
-            GameController p2 = createGameController(settings, settings.getPlayerTwoType());
+            GameController p1 = createGameController(settings, settings.getPlayerOneType(), g1);
+            GameController p2 = createGameController(settings, settings.getPlayerTwoType(), g2);
+
+            GameEventHandler h1 = createGameEventHandler(p1, settings);
             GameEventHandler h2 = createGameEventHandler(p2, settings);
             return createGameView(stage, h1, h2, settings, onExitToMenu);
-        } else {
+        } else { // 1P
+            GameController p1 = createGameController(settings, settings.getPlayerOneType(),
+                    new PieceGenerator(System.nanoTime()));
+            GameEventHandler h1 = createGameEventHandler(p1, settings);
             return createGameView(stage, h1, settings, onExitToMenu);
         }
     }
