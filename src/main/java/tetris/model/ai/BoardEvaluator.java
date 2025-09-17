@@ -1,6 +1,6 @@
 package tetris.model.ai;
 
-import tetris.util.BoardUtils;
+import tetris.model.board.BoardUtils;
 
 /**
  * BoardEvaluator evaluates Tetris board states using multiple sophisticated heuristics.

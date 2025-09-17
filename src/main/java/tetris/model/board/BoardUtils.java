@@ -1,6 +1,6 @@
-package tetris.util;
+package tetris.model.board;
 
-import tetris.model.Tetromino;
+import tetris.model.tetromino.Tetromino;
 
 /**
  * BoardUtils provides centralized Tetris game logic utilities.

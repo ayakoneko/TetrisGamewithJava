@@ -1,4 +1,6 @@
-package tetris.model;
+package tetris.model.tetromino;
+
+import tetris.model.board.Position;
 
 /**
  * Tetromino : State falling Tetris piece currently

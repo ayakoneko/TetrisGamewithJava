@@ -4,7 +4,7 @@ import tetris.controller.ai.AIController;
 import tetris.common.Action;
 import tetris.common.UiGameState; // or tetris.ui.UiGameState if you placed it there
 import tetris.controller.game.GameController;
-import tetris.model.IGameBoard;
+import tetris.model.board.IGameBoard;
 import tetris.model.setting.GameSetting;
 
 /**

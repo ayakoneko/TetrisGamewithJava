@@ -1,20 +1,22 @@
 package tetris.controller.game;
 
 import tetris.common.Action;
+import tetris.common.HighScoreManager;
 import tetris.common.UiGameState;
 import tetris.controller.api.IGameController;
 import tetris.controller.score.ScoreController;
 import tetris.controller.state.DefaultPlayStateFactory;
 import tetris.controller.state.PlayState;
 import tetris.controller.state.PlayStateFactory;
-import tetris.model.IGameBoard;
+import tetris.model.board.IGameBoard;
+import tetris.model.score.HighScoreService;
 import tetris.model.setting.GameSetting;
 import tetris.model.setting.PlayerType;
 
 public class GameController implements IGameController {
     private final IGameBoard board;
     private final PlayStateFactory stateFactory;
-    private final ScoreController scoreController = new ScoreController(); // unchanged
+    private final ScoreController scoreController; // unchanged
 
     private PlayState state; // init via setPlayerType(...)
     private int clearedLinesLastTick = 0;
@@ -23,11 +25,23 @@ public class GameController implements IGameController {
     private PlayerType playerType = PlayerType.HUMAN;
     private GameSetting gameSetting;
 
-    public GameController(IGameBoard board, GameSetting gameSetting, PlayerType playerType, PlayStateFactory stateFactory) {
+    public GameController(
+            IGameBoard board,
+            GameSetting gameSetting,
+            PlayerType playerType,
+            PlayStateFactory stateFactory,
+            ScoreController... scoreControllerOpt
+    ) {
         this.board = board;
         this.gameSetting = gameSetting;
         this.stateFactory = stateFactory;
-        setPlayerType(playerType); // sets 'state' via factory
+
+        this.scoreController =
+                (scoreControllerOpt != null && scoreControllerOpt.length > 0 && scoreControllerOpt[0] != null)
+                        ? scoreControllerOpt[0]
+                        : new ScoreController(new HighScoreService(new HighScoreManager()));
+
+        setPlayerType(playerType);
     }
 
     // Backward-compatible ctor

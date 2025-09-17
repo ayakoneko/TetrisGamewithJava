@@ -1,5 +1,7 @@
 package tetris.dto;
 
+import tetris.model.tetromino.Tetromino;
+
 /**
  * TetrominoData - Data Transfer Object for UI-safe tetromino information.
  * Provides read-only tetromino data without exposing internal Tetromino model to Views.
@@ -12,7 +14,7 @@ public record TetrominoData(
 ) {
     
     // Factory method to create from Tetromino model
-    public static TetrominoData fromTetromino(tetris.model.Tetromino tetromino) {
+    public static TetrominoData fromTetromino(Tetromino tetromino) {
         if (tetromino == null) {
             return null;
         }
@@ -33,7 +35,7 @@ public record TetrominoData(
     }
     
     // Null-safe factory method
-    public static TetrominoData fromTetrominoSafe(tetris.model.Tetromino tetromino) {
+    public static TetrominoData fromTetrominoSafe(Tetromino tetromino) {
         return tetromino != null ? fromTetromino(tetromino) : null;
     }
 }

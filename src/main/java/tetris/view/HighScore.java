@@ -1,7 +1,5 @@
 package tetris.view;
 
-import java.util.List;
-
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -10,8 +8,10 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import tetris.model.score.HighScoreManager;
+import tetris.controller.score.ScoreController;
 import tetris.model.score.ScoreEntry;
+
+import java.util.List;
 
 public class HighScore {
 
@@ -22,9 +22,11 @@ public class HighScore {
     private static final double SECTION_SPACING = 30;
 
     private final Runnable onBack;
+    private final ScoreController scoreController;
 
-    public HighScore(Runnable onBack) {
+    public HighScore(Runnable onBack, ScoreController scoreController) {
         this.onBack = onBack;
+        this.scoreController = scoreController;
     }
 
     public void startHighScore(Stage stage) {
@@ -36,8 +38,11 @@ public class HighScore {
         Label title = new Label("HIGH SCORES");
         title.getStyleClass().add("label-title");
 
-        // Get real score data from HighScoreManager
-        List<ScoreEntry> topScores = HighScoreManager.getInstance().getTopScores();
+        // refresh high score data
+        scoreController.refreshHighScores();
+
+        // get Data from ScoreController
+        List<ScoreEntry> topScores = scoreController.getTopScores();
 
         // Container for score list display
         VBox scoresContainer = new VBox(SCORE_SPACING);

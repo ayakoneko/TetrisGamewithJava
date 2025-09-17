@@ -2,7 +2,7 @@ package tetris.controller.ai;
 
 import tetris.common.Action;
 import tetris.controller.game.GameController;
-import tetris.model.Tetromino;
+import tetris.model.tetromino.Tetromino;
 import tetris.model.ai.AIMove;
 import tetris.model.ai.TetrisAI;
 

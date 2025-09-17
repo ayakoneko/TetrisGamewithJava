@@ -1,6 +1,8 @@
-package tetris.model;
+package tetris.model.board;
 
-import tetris.util.BoardUtils;
+import tetris.model.tetromino.PieceGenerator;
+import tetris.model.tetromino.Tetromino;
+import tetris.model.tetromino.TetrominoType;
 
 public class GameBoard implements IGameBoard {
     private final int width, height;

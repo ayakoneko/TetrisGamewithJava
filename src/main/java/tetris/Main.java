@@ -14,7 +14,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import tetris.controller.config.ConfigurationController;
 import tetris.factory.GameFactory;
-import tetris.model.setting.ConfigManager;
+import tetris.common.ConfigManager;
 import tetris.model.setting.GameSetting;
 import tetris.view.Configuration;
 import tetris.view.GameView;

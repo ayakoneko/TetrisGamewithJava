@@ -1,7 +1,9 @@
-package tetris.model.setting;
+package tetris.common;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import tetris.model.setting.GameSetting;
+
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;

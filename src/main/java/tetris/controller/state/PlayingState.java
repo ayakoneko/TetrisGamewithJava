@@ -3,7 +3,7 @@ package tetris.controller.state;
 import tetris.common.Action;
 import tetris.common.UiGameState;
 import tetris.controller.game.GameController;
-import tetris.model.IGameBoard;
+import tetris.model.board.IGameBoard;
 
 public class PlayingState implements PlayState {
 

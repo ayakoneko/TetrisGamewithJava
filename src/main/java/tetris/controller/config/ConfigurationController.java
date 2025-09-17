@@ -1,7 +1,7 @@
 package tetris.controller.config;
 
 import tetris.dto.GameSettingsData;
-import tetris.model.setting.ConfigManager;
+import tetris.common.ConfigManager;
 import tetris.model.setting.GameSetting;
 import tetris.model.setting.PlayerType;
 

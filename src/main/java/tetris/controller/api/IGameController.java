@@ -2,7 +2,7 @@ package tetris.controller.api;
 
 import tetris.common.Action;
 import tetris.common.UiGameState;
-import tetris.model.IGameBoard;
+import tetris.model.board.IGameBoard;
 
 public interface IGameController {
 

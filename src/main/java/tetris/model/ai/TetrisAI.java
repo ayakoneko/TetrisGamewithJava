@@ -1,9 +1,9 @@
 package tetris.model.ai;
 
-import tetris.model.IGameBoard;
-import tetris.model.Tetromino;
-import tetris.model.TetrominoType;
-import tetris.util.BoardUtils;
+import tetris.model.board.IGameBoard;
+import tetris.model.tetromino.Tetromino;
+import tetris.model.tetromino.TetrominoType;
+import tetris.model.board.BoardUtils;
 
 /**
  * TetrisAI is the main AI decision engine that implements intelligent Tetris gameplay.

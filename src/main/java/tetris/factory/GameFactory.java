@@ -1,20 +1,24 @@
 package tetris.factory;
 
 import javafx.stage.Stage;
+import tetris.common.HighScoreManager;
 import tetris.controller.config.ConfigurationController;
 import tetris.controller.event.GameEventHandler;
 import tetris.controller.game.GameController;
 import tetris.controller.score.ScoreController;
 import tetris.dto.GameSettingsData;
-import tetris.model.GameBoard;
-import tetris.model.PieceGenerator;
+import tetris.model.board.GameBoard;
+import tetris.model.score.HighScoreService;
 import tetris.model.setting.GameSetting;
 import tetris.model.setting.PlayerType;
+import tetris.model.tetromino.PieceGenerator;
 import tetris.view.Configuration;
 import tetris.view.GameView;
 import tetris.view.HighScore;
 
 public class GameFactory {
+
+    private static ScoreController sharedScoreController;
     
     // Creates a new GameController with the specified settings
     public static GameController createGameController(GameSetting settings,PlayerType type,PieceGenerator shared) {
@@ -80,11 +84,14 @@ public class GameFactory {
     
     // Creates a new ScoreController for scoring management
     public static ScoreController createScoreController() {
-        return new ScoreController();
+        if (sharedScoreController == null) {
+            sharedScoreController = new ScoreController(new HighScoreService(new HighScoreManager()));
+        }
+        return sharedScoreController;
     }
-    
+
     // Creates a new HighScore view
     public static HighScore createHighScore(Runnable onBackToMenu) {
-        return new HighScore(onBackToMenu);
+        return new HighScore(onBackToMenu, createScoreController()); // 컨트롤러 주입
     }
 }

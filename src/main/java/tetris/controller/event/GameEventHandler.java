@@ -7,7 +7,7 @@ import tetris.controller.game.GameController;
 import tetris.dto.GameSettingsData;
 import tetris.dto.GameStateData;
 import tetris.dto.TetrominoData;
-import tetris.model.setting.ConfigManager;
+import tetris.common.ConfigManager;
 import tetris.model.setting.GameSetting;
 
 /**

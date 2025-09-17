@@ -1,4 +1,6 @@
-package tetris.model;
+package tetris.model.board;
+
+import tetris.model.tetromino.Tetromino;
 
 /**
  * IGameBoard: abstraction for the Tetris playfield & core game logic.

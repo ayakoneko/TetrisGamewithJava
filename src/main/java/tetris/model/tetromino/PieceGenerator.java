@@ -1,4 +1,4 @@
-package tetris.model;
+package tetris.model.tetromino;
 
 import java.util.*;
 
