@@ -1,6 +1,6 @@
 package tetris.common;
 
-public enum GameState {
+public enum UiGameState {
     PLAY,
     PAUSE,
     GAME_OVER

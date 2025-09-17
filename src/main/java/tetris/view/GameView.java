@@ -13,15 +13,17 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import tetris.common.Action;
+import tetris.common.UiGameState;
 import tetris.controller.event.GameEventHandler;
 import tetris.dto.GameSettingsData;
 import tetris.dto.GameStateData;
 import tetris.dto.TetrominoData;
 import tetris.viewmodel.GameViewModel;
-import javafx.scene.text.Text;
+
 import java.util.Optional;
 
 /**
@@ -287,9 +289,9 @@ public class GameView {
         if (isTwoPlayer()) p2Handler.pauseGame();
 
         GameStateData gameData = p1Handler.getGameStateData();
-        if (gameData.gameState() == GameStateData.GameState.PAUSE) {
+        if (gameData.gameState() == UiGameState.PAUSE) {
             loop.stop();
-        } else if (gameData.gameState() == GameStateData.GameState.PLAY) {
+        } else if (gameData.gameState() == UiGameState.PLAY) {
             loop.start();
         }
         renderOnce(); // Update overlay text
@@ -299,7 +301,7 @@ public class GameView {
     // Shows confirmation dialog before returning to main menu.
     private void askExitToMenu() {
         GameStateData gameData = p1Handler.getGameStateData();
-        boolean wasPlaying = (gameData.gameState() == GameStateData.GameState.PLAY);
+        boolean wasPlaying = (gameData.gameState() == UiGameState.PLAY);
 
         if (wasPlaying) {             // Pause game before show alert
             p1Handler.pauseGame();    // PLAY -> PAUSE
@@ -365,7 +367,7 @@ public class GameView {
                 drawCenteredOverlay(g, canvas, "GAME OVER\nPress R to Restart\nESC to Menu");
                 loop.stop();
             }
-            default -> { /* PLAY: no overlay */ }
+            default -> { /* PLAY */ }
         }
 
         drawHud(g, canvas, gameData.currentScore());

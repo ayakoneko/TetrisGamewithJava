@@ -1,7 +1,7 @@
 package tetris.controller.state;
 
 import tetris.common.Action;
-import tetris.common.GameState;
+import tetris.common.UiGameState;
 import tetris.controller.game.GameController;
 
 public interface PlayState {
@@ -13,5 +13,5 @@ public interface PlayState {
     void restart(GameController c);
     void reset(GameController c);
 
-    GameState uiState();
+    UiGameState uiState();
 }

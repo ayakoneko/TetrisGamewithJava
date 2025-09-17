@@ -1,7 +1,7 @@
 package tetris.controller.state;
 
 import tetris.common.Action;
-import tetris.common.GameState;
+import tetris.common.UiGameState;
 import tetris.controller.game.GameController;
 
 public class GameOverState implements PlayState {
@@ -28,5 +28,5 @@ public class GameOverState implements PlayState {
 
     @Override public void reset(GameController c) { c.board().reset(); }
 
-    @Override public GameState uiState() { return GameState.GAME_OVER; }
+    @Override public UiGameState uiState() { return UiGameState.GAME_OVER; }
 }

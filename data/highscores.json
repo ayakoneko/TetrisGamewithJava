@@ -6,5 +6,8 @@
   "score" : 7200
 }, {
   "playerName" : "Player",
+  "score" : 1200
+}, {
+  "playerName" : "Player",
   "score" : 600
 } ]

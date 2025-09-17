@@ -1,7 +1,7 @@
 package tetris.controller.state;
 
 import tetris.common.Action;
-import tetris.common.GameState;
+import tetris.common.UiGameState;
 import tetris.controller.game.GameController;
 import tetris.model.IGameBoard;
 
@@ -48,8 +48,8 @@ public class PlayingState implements PlayState {
         }
     }
 
-    @Override public void togglePause(GameController c) { c.setState(new PausedState(this)); }
+    @Override public void togglePause(GameController c) {c.setState(new PausedState(this, c.getStateFactory())); }
     @Override public void restart(GameController c) { c.setState(new PlayingState()); c.board().reset(); start(c); }
     @Override public void reset(GameController c) { c.board().reset(); }  // keep playing after reset
-    @Override public GameState uiState() { return GameState.PLAY; }
+    @Override public UiGameState uiState() { return UiGameState.PLAY; }
 }

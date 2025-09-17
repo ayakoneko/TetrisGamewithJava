@@ -1,7 +1,7 @@
 package tetris.controller.event;
 
 import tetris.common.Action;
-import tetris.common.GameState;
+import tetris.common.UiGameState;
 import tetris.controller.audio.AudioController;
 import tetris.controller.game.GameController;
 import tetris.dto.GameSettingsData;
@@ -39,7 +39,7 @@ public class GameEventHandler {
     }
 
     public void restartGame() {
-        if (gameController.state() == GameState.GAME_OVER) {
+        if (gameController.state() == UiGameState.GAME_OVER) {
             gameController.restart();
         }
     }
@@ -88,11 +88,7 @@ public class GameEventHandler {
                 gameController.board().current()
         );
 
-        GameStateData.GameState uiState = switch (gameController.state()) {
-            case PLAY -> GameStateData.GameState.PLAY;
-            case PAUSE -> GameStateData.GameState.PAUSE;
-            case GAME_OVER -> GameStateData.GameState.GAME_OVER;
-        };
+        UiGameState uiState = gameController.state();
 
         return GameStateData.create(
                 gameController.board().cells(),

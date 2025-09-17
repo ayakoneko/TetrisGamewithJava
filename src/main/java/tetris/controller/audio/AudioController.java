@@ -8,7 +8,6 @@ import tetris.common.AudioManager;
  * maintaining proper MVC separation.
  */
 public class AudioController {
-    
     // Background Music Control
     public void playBackgroundMusic(String filename) {
         AudioManager.playBGM(filename, true);

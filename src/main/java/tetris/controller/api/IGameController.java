@@ -1,13 +1,13 @@
 package tetris.controller.api;
 
 import tetris.common.Action;
-import tetris.common.GameState;
+import tetris.common.UiGameState;
 import tetris.model.IGameBoard;
 
 public interface IGameController {
 
     IGameBoard board();
-    GameState state();
+    UiGameState state();
 
     void start();
     void tick();

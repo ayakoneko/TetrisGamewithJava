@@ -1,5 +1,7 @@
 package tetris.dto;
 
+import tetris.common.UiGameState;
+
 /**
  * GameStateData - Data Transfer Object for UI-safe game state information.
  * Provides read-only game state data without exposing internal models to Views.
@@ -7,21 +9,16 @@ package tetris.dto;
 public record GameStateData(
     int[][] boardCells,
     TetrominoData currentPiece,
-    GameState gameState,
+    UiGameState gameState,
     int currentScore,
     boolean musicOn,
     boolean sfxOn
 ) {
-    
-    public enum GameState {
-        PLAY, PAUSE, GAME_OVER
-    }
-    
     // Factory method to create from game components
     public static GameStateData create(
         int[][] cells,
-        TetrominoData piece, 
-        GameState state,
+        TetrominoData piece,
+        UiGameState  state,
         int score,
         boolean music,
         boolean sfx
