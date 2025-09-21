@@ -1,13 +1,13 @@
 package tetris.controller.event;
 
 import tetris.common.Action;
+import tetris.common.ConfigManager;
 import tetris.common.UiGameState;
 import tetris.controller.audio.AudioController;
 import tetris.controller.game.GameController;
 import tetris.dto.GameSettingsData;
 import tetris.dto.GameStateData;
 import tetris.dto.TetrominoData;
-import tetris.common.ConfigManager;
 import tetris.model.setting.GameSetting;
 
 /**
@@ -22,11 +22,20 @@ public class GameEventHandler {
     private final GameController gameController;
     private final GameSetting settings;
     private final AudioController audioController;
+    private String playerName = "Player"; // Default player name
+    private int playerNumber = 1; // Player number (1 or 2)
 
     public GameEventHandler(GameController gameController, GameSetting settings) {
         this.gameController = gameController;
         this.settings = settings;
         this.audioController = new AudioController();
+    }
+
+    public GameEventHandler(GameController gameController, GameSetting settings, int playerNumber) {
+        this.gameController = gameController;
+        this.settings = settings;
+        this.audioController = new AudioController();
+        this.playerNumber = playerNumber;
     }
 
     // Game control events
@@ -82,6 +91,39 @@ public class GameEventHandler {
         }
     }
 
+    // Player name management
+    public void setPlayerName(String name) {
+        this.playerName = (name == null || name.trim().isEmpty()) ? "Player" : name.trim();
+    }
+
+    public String getPlayerName() {
+        // Show "AI" for AI players in HUD display
+        if (gameController.getPlayerType() == tetris.model.setting.PlayerType.AI) {
+            return "AI";
+        }
+        return playerName;
+    }
+
+    public int getPlayerNumber() {
+        return playerNumber;
+    }
+
+    // Score-related methods for high score management
+    public boolean isEligibleForHighScore(int score) {
+        return gameController.isEligibleForHighScore(score);
+    }
+
+
+    // Submit score with stored player name
+    public boolean submitStoredScore() {
+        int currentScore = gameController.getCurrentScore();
+        // Only submit if score is non-zero and eligible for high scores
+        if (currentScore > 0 && isEligibleForHighScore(currentScore)) {
+            return gameController.submitFinalScore(playerName);
+        }
+        return false;
+    }
+
     // Data access for Views - returns DTOs instead of direct model access
     public GameStateData getGameStateData() {
         TetrominoData currentPiece = TetrominoData.fromTetrominoSafe(
@@ -117,6 +159,35 @@ public class GameEventHandler {
         return gameController.getPlayerType() == tetris.model.setting.PlayerType.AI;
     }
 
+    // Get current level and lines cleared
+    public int getCurrentLevel() {
+        return gameController.getCurrentLevel();
+    }
+
+    public int getTotalLinesCleared() {
+        return gameController.getTotalLinesCleared();
+    }
+
+    public int getCurrentScore() {
+        return gameController.getCurrentScore();
+    }
+
+    public tetris.model.tetromino.TetrominoType getNextTetrominoType() {
+        if (gameController.board() instanceof tetris.model.board.GameBoard gameBoard) {
+            return gameBoard.getNextTetrominoType();
+        }
+        return null;
+    }
+
+    // Get current audio state for real-time HUD updates
+    public boolean isMusicOn() {
+        return settings.isMusicOn();
+    }
+
+    public boolean isSfxOn() {
+        return settings.isSfxOn();
+    }
+
     // Audio control for Views
     public void startBackgroundMusic() {
         if (settings.isMusicOn()) {
@@ -128,12 +199,5 @@ public class GameEventHandler {
         audioController.stopBackgroundMusic();
     }
     
-    // Save current score to high score manager
-    public void saveCurrentScore() {
-        int currentScore = gameController.getCurrentScore();
-        if (currentScore > 0) {
-            gameController.submitFinalScore("Player");
-        }
-    }
 
 }

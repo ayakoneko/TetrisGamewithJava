@@ -35,6 +35,11 @@ public class GameFactory {
     public static GameEventHandler createGameEventHandler(GameController gameController, GameSetting settings) {
         return new GameEventHandler(gameController, settings);
     }
+
+    // Creates a new GameEventHandler with player number
+    public static GameEventHandler createGameEventHandler(GameController gameController, GameSetting settings, int playerNumber) {
+        return new GameEventHandler(gameController, settings, playerNumber);
+    }
     
     // Creates a new GameView with proper event handling
     public static GameView createGameView(Stage stage,
@@ -66,13 +71,13 @@ public class GameFactory {
             GameController p1 = createGameController(settings, settings.getPlayerOneType(), g1);
             GameController p2 = createGameController(settings, settings.getPlayerTwoType(), g2);
 
-            GameEventHandler h1 = createGameEventHandler(p1, settings);
-            GameEventHandler h2 = createGameEventHandler(p2, settings);
+            GameEventHandler h1 = createGameEventHandler(p1, settings, 1);
+            GameEventHandler h2 = createGameEventHandler(p2, settings, 2);
             return createGameView(stage, h1, h2, settings, onExitToMenu);
         } else { // 1P
             GameController p1 = createGameController(settings, settings.getPlayerOneType(),
                     new PieceGenerator(System.nanoTime()));
-            GameEventHandler h1 = createGameEventHandler(p1, settings);
+            GameEventHandler h1 = createGameEventHandler(p1, settings, 1);
             return createGameView(stage, h1, settings, onExitToMenu);
         }
     }

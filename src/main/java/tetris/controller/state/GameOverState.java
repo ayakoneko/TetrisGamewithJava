@@ -6,11 +6,8 @@ import tetris.controller.game.GameController;
 
 public class GameOverState implements PlayState {
     @Override public void start(GameController c) { 
-        // Save the score when game over occurs using ScoreController
-        int finalScore = c.getCurrentScore();
-        if (finalScore > 0) {
-            c.submitFinalScore("Player");
-        }
+        // Game over state - score submission will be handled by GameView
+        // using the player name that was collected before the game started
     }
 
     @Override public void tick(GameController c)  { /* no tick */ }

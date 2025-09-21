@@ -1,9 +1,9 @@
 package tetris.controller.score;
 
+import java.util.List;
+
 import tetris.model.score.HighScoreService;
 import tetris.model.score.ScoreEntry;
-
-import java.util.List;
 
 public class ScoreController {
     private final HighScoreService highScoreService;
@@ -34,5 +34,15 @@ public class ScoreController {
 
     public void refreshHighScores() {
         highScoreService.refreshFromStore();
+    }
+
+    // Check if a score is eligible to be added to high scores
+    public boolean isEligibleForHighScore(int score) {
+        return highScoreService.isEligibleForHighScore(score);
+    }
+
+    // Clear all high scores
+    public void clearHighScores() {
+        highScoreService.clearScores();
     }
 }

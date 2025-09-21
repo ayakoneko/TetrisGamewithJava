@@ -23,7 +23,7 @@ public class HighScoreService {
     public boolean submitScore(String name) {
         if (currentScore <= 0) return false;
 
-        String playerName = (name == null || name.isBlank()) ? "Anonymous" : name.trim();
+        String playerName = (name == null || name.isBlank()) ? "Player" : name.trim();
         ScoreEntry entry = new ScoreEntry(playerName, currentScore);
 
         scores.add(entry);
@@ -59,5 +59,20 @@ public class HighScoreService {
         this.scores.addAll(fresh);
         this.scores.sort((a,b) -> Integer.compare(b.getScore(), a.getScore()));
         trim();
+    }
+
+    // Check if a score is eligible to be added to high scores
+    public boolean isEligibleForHighScore(int score) {
+        if (score <= 0) return false;
+        if (scores.size() < MAX) return true; // Always eligible if list not full
+        // Check if score is better than the worst (lowest) score in the list
+        int worstScore = scores.get(scores.size() - 1).getScore();
+        return score > worstScore;
+    }
+
+    // Clear all high scores
+    public void clearScores() {
+        scores.clear();
+        store.save(scores);
     }
 }

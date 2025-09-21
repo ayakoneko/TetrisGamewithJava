@@ -20,6 +20,7 @@ public class GameController implements IGameController {
 
     private PlayState state; // init via setPlayerType(...)
     private int clearedLinesLastTick = 0;
+    private int totalLinesCleared = 0;
 
     // player/config
     private PlayerType playerType = PlayerType.HUMAN;
@@ -73,9 +74,18 @@ public class GameController implements IGameController {
 
     public void setClearedLinesLastTick(int cleared) {
         this.clearedLinesLastTick = cleared;
+        this.totalLinesCleared += cleared;
         if (cleared > 0 && gameSetting != null) {
             scoreController.addLinesScore(cleared, gameSetting.getLevel());
         }
+    }
+
+    public int getTotalLinesCleared() {
+        return totalLinesCleared;
+    }
+
+    public int getCurrentLevel() {
+        return gameSetting != null ? gameSetting.getLevel() : 1;
     }
 
     // ---- IGameController ----
@@ -84,11 +94,12 @@ public class GameController implements IGameController {
     @Override public void handle(Action action) { state.handle(this, action); }
     @Override public void start() { state.start(this); }
     @Override public void togglePause() { state.togglePause(this); }
-    @Override public void restart() { scoreController.resetScore(); state.restart(this); }
-    @Override public void reset() { scoreController.resetScore(); state.reset(this); }
+    @Override public void restart() { scoreController.resetScore(); totalLinesCleared = 0; state.restart(this); }
+    @Override public void reset() { scoreController.resetScore(); totalLinesCleared = 0; state.reset(this); }
     @Override public void tick() { state.tick(this); }
 
     // ---- Scoring façade ----
     public int getCurrentScore() { return scoreController.getCurrentScore(); }
     public boolean submitFinalScore(String playerName) { return scoreController.submitScore(playerName); }
+    public boolean isEligibleForHighScore(int score) { return scoreController.isEligibleForHighScore(score); }
 }

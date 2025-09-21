@@ -1,5 +1,7 @@
 package tetris;
 
+import java.util.Optional;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -9,19 +11,19 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import tetris.common.ConfigManager;
 import tetris.controller.config.ConfigurationController;
 import tetris.factory.GameFactory;
-import tetris.common.ConfigManager;
 import tetris.model.setting.GameSetting;
+import tetris.model.setting.PlayerType;
 import tetris.view.Configuration;
 import tetris.view.GameView;
 import tetris.view.HighScore;
 import tetris.view.SplashWindow;
-
-import java.util.Optional;
 
 public class Main extends Application {
 
@@ -33,6 +35,10 @@ public class Main extends Application {
     private static final double TITLE_SPACING = 40;
 
     private final GameSetting settings = new GameSetting();
+    
+    // Store player names for later use
+    private String player1Name = null;
+    private String player2Name = null;
 
     @Override
     public void start(Stage primaryStage){
@@ -51,6 +57,11 @@ public class Main extends Application {
 
         // Navigation buttons
         Button playButton = createMenuButton("Play", () -> {
+            // Prompt for player names BEFORE hiding the main menu
+            if (!promptPlayerNames()) {
+                return; // User cancelled, stay on main menu
+            }
+
             primaryStage.hide();
 
             // Create controllers and event handler using factory
@@ -59,6 +70,10 @@ public class Main extends Application {
                     settings,
                     () -> showMainMenu(primaryStage)
             );
+            
+            // Set player names (already validated)
+            setPlayerNames(gameView);
+            
             gameView.startGame();
         });
 
@@ -125,8 +140,72 @@ public class Main extends Application {
         return button;
     }
 
-    // Shows a confirmation dialog before exiting the application.
+    // Prompts for player names based on player types - returns true if successful, false if cancelled
+    private boolean promptPlayerNames() {
+        if (settings.isExtendOn()) {
+            // 2-player mode: prompt for each human/external player
+            if (settings.getPlayerOneType() == PlayerType.HUMAN || settings.getPlayerOneType() == PlayerType.EXTERNAL) {
+                player1Name = promptPlayerName("Player 1");
+                if (player1Name == null) {
+                    return false; // User cancelled
+                }
+            }
+            
+            if (settings.getPlayerTwoType() == PlayerType.HUMAN || settings.getPlayerTwoType() == PlayerType.EXTERNAL) {
+                player2Name = promptPlayerName("Player 2");
+                if (player2Name == null) {
+                    return false; // User cancelled
+                }
+            }
+        } else {
+            // Single player mode: only prompt if human/external
+            if (settings.getPlayerOneType() == PlayerType.HUMAN || settings.getPlayerOneType() == PlayerType.EXTERNAL) {
+                player1Name = promptPlayerName("Player");
+                if (player1Name == null) {
+                    return false; // User cancelled
+                }
+            }
+        }
+        return true; // All prompts completed successfully
+    }
 
+    // Set player names in the game view
+    private void setPlayerNames(GameView gameView) {
+        if (settings.isExtendOn()) {
+            if (player1Name != null) {
+                gameView.setPlayer1Name(player1Name);
+            }
+            if (player2Name != null) {
+                gameView.setPlayer2Name(player2Name);
+            }
+        } else {
+            if (player1Name != null) {
+                gameView.setPlayerName(player1Name);
+            }
+        }
+    }
+
+    // Helper method to prompt for a single player name
+    private String promptPlayerName(String defaultName) {
+        TextInputDialog nameDialog = new TextInputDialog(defaultName);
+        nameDialog.setTitle("Player Name");
+        nameDialog.setHeaderText(null);
+        nameDialog.setContentText("Please enter " + defaultName.toLowerCase() + " name:");
+        
+        // Set minimum width to prevent text truncation
+        nameDialog.getDialogPane().setMinWidth(300);
+        
+        Optional<String> result = nameDialog.showAndWait();
+        
+        if (!result.isPresent()) {
+            return null; // User cancelled
+        }
+        
+        String playerName = result.get().trim();
+        return playerName.isEmpty() ? defaultName : playerName;
+    }
+
+    // Shows a confirmation dialog before exiting the application.
     private void showExitConfirmation() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Exit Confirmation");

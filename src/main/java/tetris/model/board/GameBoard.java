@@ -22,6 +22,10 @@ public class GameBoard implements IGameBoard {
     @Override public int getWidth()  { return width; }
     @Override public int getHeight() { return height; }
 
+    public TetrominoType getNextTetrominoType() {
+        return generator != null ? generator.peekNext() : null;
+    }
+
     @Override
     public boolean newPiece() {
         TetrominoType t;

@@ -1,6 +1,11 @@
 package tetris.model.tetromino;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.List;
+import java.util.Random;
 
 public class PieceGenerator {
     private final Random rng;
@@ -20,5 +25,10 @@ public class PieceGenerator {
     public TetrominoType next() {
         if (bag.isEmpty()) refill();
         return bag.removeFirst();
+    }
+
+    public TetrominoType peekNext() {
+        if (bag.isEmpty()) refill();
+        return bag.peekFirst();
     }
 }

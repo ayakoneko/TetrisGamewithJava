@@ -1,7 +1,6 @@
 package tetris.viewmodel;
 
 import javafx.scene.paint.Color;
-import tetris.dto.GameSettingsData;
 
 public class GameViewModel {
     
@@ -15,10 +14,8 @@ public class GameViewModel {
     public static final Color TEXT_COLOR = Color.WHITE;
     public static final Color HUD_BACKGROUND = Color.rgb(0, 0, 0, 0.35);
     
-    private final GameSettingsData settings;
-    
-    public GameViewModel(GameSettingsData settings) {
-        this.settings = settings;
+    public GameViewModel() {
+        // No longer needs settings parameter since audio state is passed directly
     }
     
     // Returns the color for a given tetromino block ID
@@ -43,11 +40,32 @@ public class GameViewModel {
         return base - ((long)(lvl - 1) * step);
     }
     
-    // Formats HUD text with score information
-    public String formatHudText(int currentScore) {
-        String musicTxt = settings.musicOn() ? "On" : "Off";
-        String sfxTxt   = settings.sfxOn()   ? "On" : "Off";
-        return "Score: " + currentScore + "    Music [M]: " + musicTxt + "    SFX [S]: " + sfxTxt;
+    // Formats HUD text with player name and score information
+    public String formatHudTextWithPlayer(String playerName, int currentScore, int level, int linesCleared, boolean musicOn, boolean sfxOn) {
+        return formatHudText(playerName, currentScore, level, linesCleared, "[M]", "[S]", false, musicOn, sfxOn);
+    }
+
+    // Formats HUD text for two-player mode with player-specific audio controls
+    public String formatHudTextTwoPlayer(String playerName, int currentScore, int level, int linesCleared, int playerNumber, boolean musicOn, boolean sfxOn) {
+        String musicKey = playerNumber == 1 ? "[M1]" : "[M2]";
+        String sfxKey = playerNumber == 1 ? "[S1]" : "[S2]";
+        return formatHudText(playerName, currentScore, level, linesCleared, musicKey, sfxKey, true, musicOn, sfxOn);
+    }
+
+    // Shared HUD formatting logic with multi-line layout
+    private String formatHudText(String playerName, int currentScore, int level, int linesCleared, String musicKey, String sfxKey, boolean isTwoPlayer, boolean musicOn, boolean sfxOn) {
+        String musicTxt = musicOn ? "On" : "Off";
+        String sfxTxt = sfxOn ? "On" : "Off";
+        
+        if (isTwoPlayer) {
+            // Two-player mode: more compact layout
+            return String.format("%s\nScore: %d | Level: %d | Lines: %d\nMusic %s: %s | SFX %s: %s", 
+                    playerName, currentScore, level, linesCleared, musicKey, musicTxt, sfxKey, sfxTxt);
+        } else {
+            // Single-player mode: organized layout
+            return String.format("%s\nScore: %d | Level: %d | Lines: %d\nMusic %s: %s | SFX %s: %s", 
+                    playerName, currentScore, level, linesCleared, musicKey, musicTxt, sfxKey, sfxTxt);
+        }
     }
     
     // Calculates canvas dimensions based on board size
