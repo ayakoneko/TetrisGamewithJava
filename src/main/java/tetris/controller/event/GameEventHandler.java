@@ -97,10 +97,7 @@ public class GameEventHandler {
     }
 
     public String getPlayerName() {
-        // Show "AI" for AI players in HUD display
-        if (gameController.getPlayerType() == tetris.model.setting.PlayerType.AI) {
-            return "AI";
-        }
+        // Return the actual player name (entered by user or default)
         return playerName;
     }
 
@@ -157,6 +154,31 @@ public class GameEventHandler {
     // Check if AI is currently active
     public boolean isAIActive() {
         return gameController.getPlayerType() == tetris.model.setting.PlayerType.AI;
+    }
+
+    // External player status methods
+    public boolean isExternalPlayer() {
+        return gameController.getPlayerType() == tetris.model.setting.PlayerType.EXTERNAL;
+    }
+
+    public boolean isExternalServerAvailable() {
+        if (!isExternalPlayer()) return false;
+
+        // Get server status from the current game state
+        tetris.controller.state.PlayState currentState = gameController.getState();
+        if (currentState instanceof tetris.controller.state.ExternalPlayingState externalState) {
+            return externalState.isServerAvailable();
+        }
+        return false;
+    }
+
+    // Get player type display string for HUD
+    public String getPlayerTypeDisplay() {
+        return switch (gameController.getPlayerType()) {
+            case HUMAN -> "HUMAN";
+            case AI -> "AI";
+            case EXTERNAL -> isExternalServerAvailable() ? "EXTERNAL" : "EXTERNAL (NO SERVER)";
+        };
     }
 
     // Get current level and lines cleared

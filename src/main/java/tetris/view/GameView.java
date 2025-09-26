@@ -79,6 +79,9 @@ public class GameView {
     private final Runnable onExitToMenu;
     private final GameViewModel viewModel;
 
+    // Flag to ensure scores are only submitted once per game over
+    private boolean scoresAlreadySubmitted = false;
+
     // ==================== CONSTRUCTOR & INITIALIZATION ====================
     
     public GameView(Stage stage, GameEventHandler p1Handler,GameEventHandler p2Handler, GameSettingsData settings, Runnable onExitToMenu) {
@@ -158,30 +161,37 @@ public class GameView {
     private VBox createPlayerInfoSection(GameEventHandler handler) {
         VBox section = new VBox(10);
         section.getStyleClass().addAll("hud-section", "hud-player-info");
-        
+
         // Title
         Label title = new Label("PLAYER INFO");
         title.getStyleClass().add("hud-title");
         section.getChildren().add(title);
-        
+
         // Player Name
         Label playerName = new Label(handler.getPlayerName());
         playerName.getStyleClass().add("hud-player-name");
         section.getChildren().add(playerName);
-        
-        // Stats
+
+        // Player Type
+        Label playerType = new Label("Type: " + handler.getPlayerTypeDisplay());
+        playerType.getStyleClass().add("hud-stat");
+        section.getChildren().add(playerType);
+
+        // Score
         Label scoreLabel = new Label("Score: " + handler.getCurrentScore());
         scoreLabel.getStyleClass().add("hud-stat");
         section.getChildren().add(scoreLabel);
-        
+
+        // Level
         Label levelLabel = new Label("Level: " + handler.getCurrentLevel());
         levelLabel.getStyleClass().add("hud-stat");
         section.getChildren().add(levelLabel);
-        
+
+        // Lines
         Label linesLabel = new Label("Lines: " + handler.getTotalLinesCleared());
         linesLabel.getStyleClass().add("hud-stat");
         section.getChildren().add(linesLabel);
-        
+
         return section;
     }
 
@@ -263,15 +273,19 @@ public class GameView {
         // Update player name
         Label playerNameLabel = (Label) section.getChildren().get(1);
         playerNameLabel.setText(handler.getPlayerName());
-        
+
+        // Update player type
+        Label playerTypeLabel = (Label) section.getChildren().get(2);
+        playerTypeLabel.setText("Type: " + handler.getPlayerTypeDisplay());
+
         // Update stats
-        Label scoreLabel = (Label) section.getChildren().get(2);
+        Label scoreLabel = (Label) section.getChildren().get(3);
         scoreLabel.setText("Score: " + handler.getCurrentScore());
-        
-        Label levelLabel = (Label) section.getChildren().get(3);
+
+        Label levelLabel = (Label) section.getChildren().get(4);
         levelLabel.setText("Level: " + handler.getCurrentLevel());
-        
-        Label linesLabel = (Label) section.getChildren().get(4);
+
+        Label linesLabel = (Label) section.getChildren().get(5);
         linesLabel.setText("Lines: " + handler.getTotalLinesCleared());
     }
 
@@ -460,6 +474,9 @@ public class GameView {
     }
     
     private void forwardRestart() {
+        // Reset score submission flag for restarted game
+        scoresAlreadySubmitted = false;
+
         p1Handler.restartGame();
         if (isTwoPlayer()) p2Handler.restartGame();
         loop.start();
@@ -493,6 +510,17 @@ public class GameView {
         }
     }
 
+    // Submit scores for all players, checking each independently for top 10 qualification
+    private void submitAllPlayerScores() {
+        // Always check Player 1
+        p1Handler.submitStoredScore();
+
+        // Check Player 2 if in two-player mode
+        if (isTwoPlayer()) {
+            p2Handler.submitStoredScore();
+        }
+    }
+
 
 
     // ==================== GAME LIFECYCLE ====================
@@ -502,10 +530,13 @@ public class GameView {
         stage.setScene(buildScreen());
         startBothPlayers();
         stage.show();
-        
+
+        // Reset score submission flag for new game
+        scoresAlreadySubmitted = false;
+
         // Audio handled by event handler
         p1Handler.startBackgroundMusic();
-        
+
         loop.start();
         renderOnce();
     }
@@ -530,6 +561,12 @@ public class GameView {
 
         if (result.isPresent() && result.get() == ButtonType.OK) {
             loop.stop();
+
+            // Submit scores before exiting if game was in progress
+            if (wasPlaying) {
+                submitAllPlayerScores();
+            }
+
             // Reset game before exiting to menu - delegate to controller
             p1Handler.resetGame();
             if (isTwoPlayer()) {
@@ -577,10 +614,19 @@ public class GameView {
             case GAME_OVER -> {
                 drawCenteredOverlay(g, canvas, "GAME OVER\nPress R to Restart\nESC to Menu");
                 loop.stop();
-                // Score submission handled by GameEventHandler (Controller layer)
-                handler.submitStoredScore();
+                // Score submission for all players when any player reaches game over (only once)
+                if (!scoresAlreadySubmitted) {
+                    submitAllPlayerScores();
+                    scoresAlreadySubmitted = true;
+                }
             }
-            default -> { /* PLAY */ }
+            case PLAY -> {
+                // Show warning for external players when server unavailable
+                if (handler.isExternalPlayer() && !handler.isExternalServerAvailable()) {
+                    drawWarningOverlay(g, canvas, "EXTERNAL SERVER UNAVAILABLE\nNo player control\nStart TetrisServer.jar to resume");
+                }
+            }
+            default -> { /* Other states */ }
         }
     }
 
@@ -655,6 +701,21 @@ public class GameView {
 
         g.setFill(GameViewModel.TEXT_COLOR);
         g.setFont(Font.font("Arial", 20));
+        g.setTextAlign(TextAlignment.CENTER);
+        g.setTextBaseline(VPos.CENTER);
+        g.fillText(text, canvas.getWidth() / 2, canvas.getHeight() / 2);
+    }
+
+    /**
+     * Draws a warning overlay with semi-transparent background (for server unavailable warning).
+     */
+    private void drawWarningOverlay(GraphicsContext g, Canvas canvas, String text) {
+        // Semi-transparent orange background
+        g.setFill(javafx.scene.paint.Color.rgb(255, 165, 0, 0.7));
+        g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+
+        g.setFill(javafx.scene.paint.Color.WHITE);
+        g.setFont(Font.font("Arial", 16));
         g.setTextAlign(TextAlignment.CENTER);
         g.setTextBaseline(VPos.CENTER);
         g.fillText(text, canvas.getWidth() / 2, canvas.getHeight() / 2);

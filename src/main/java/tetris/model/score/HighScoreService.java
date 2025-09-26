@@ -20,16 +20,32 @@ public class HighScoreService {
         currentScore += ScoreCalculator.computeLineClearScore(linesCleared, level);
     }
 
-    public boolean submitScore(String name) {
+    public synchronized boolean submitScore(String name) {
         if (currentScore <= 0) return false;
+
+        // Check if score qualifies for top 10 before adding
+        if (!isEligibleForHighScore(currentScore)) {
+            currentScore = 0;
+            return false;
+        }
 
         String playerName = (name == null || name.isBlank()) ? "Player" : name.trim();
         ScoreEntry entry = new ScoreEntry(playerName, currentScore);
 
-        scores.add(entry);
-        scores.sort((a, b) -> Integer.compare(b.getScore(), a.getScore()));
-        trim();
-        store.save(scores);
+        // Load fresh data from file to get any recent submissions from other players
+        List<ScoreEntry> currentScores = store.load();
+        currentScores.add(entry);
+        currentScores.sort((a, b) -> Integer.compare(b.getScore(), a.getScore()));
+
+        // Keep only top 10
+        if (currentScores.size() > MAX) {
+            currentScores = currentScores.subList(0, MAX);
+        }
+
+        // Save the updated list and update our in-memory copy
+        store.save(currentScores);
+        this.scores.clear();
+        this.scores.addAll(currentScores);
 
         currentScore = 0;
         return true;

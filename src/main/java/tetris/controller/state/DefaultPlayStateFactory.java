@@ -7,9 +7,9 @@ public class DefaultPlayStateFactory implements PlayStateFactory {
     @Override
     public PlayState createInitial(GameSetting settings, PlayerType playerType) {
         return switch (playerType) {
-            case AI      -> new AIPlayingState(settings); // drop PlayerType arg
-            case HUMAN,
-                 EXTERNAL -> new PlayingState();
+            case AI       -> new AIPlayingState(settings);
+            case EXTERNAL -> new ExternalPlayingState(settings);
+            case HUMAN    -> new PlayingState();
         };
     }
 

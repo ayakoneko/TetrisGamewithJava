@@ -23,7 +23,9 @@ public class GameFactory {
     // Creates a new GameController with the specified settings
     public static GameController createGameController(GameSetting settings,PlayerType type,PieceGenerator shared) {
         GameBoard board = new GameBoard(settings.getFieldWidth(), settings.getFieldHeight(), shared);
-        return new GameController(board, settings, type);
+        // Each player needs separate score tracking, but should share the high score store
+        ScoreController playerScoreController = new ScoreController(new HighScoreService(new HighScoreManager()));
+        return new GameController(board, settings, type, new tetris.controller.state.DefaultPlayStateFactory(), playerScoreController);
     }
 
     // Creates a new ConfigurationController for settings management

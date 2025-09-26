@@ -34,7 +34,7 @@ public class Main extends Application {
     private static final double MENU_SPACING = 20;
     private static final double TITLE_SPACING = 40;
 
-    private final GameSetting settings = new GameSetting();
+    private final GameSetting settings = ConfigManager.loadOrDefault();
     
     // Store player names for later use
     private String player1Name = null;
@@ -42,7 +42,6 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage){
-        ConfigManager.clear();
         new SplashWindow().show(primaryStage, () -> showMainMenu(primaryStage));
     }
 
@@ -127,6 +126,7 @@ public class Main extends Application {
 
         primaryStage.setScene(mainScene);
         primaryStage.setTitle("Tetris Game");
+        primaryStage.centerOnScreen();
         primaryStage.show();
     }
 
@@ -140,33 +140,39 @@ public class Main extends Application {
         return button;
     }
 
-    // Prompts for player names based on player types - returns true if successful, false if cancelled
+    // Prompts for player names for all player types - returns true if successful, false if cancelled
     private boolean promptPlayerNames() {
         if (settings.isExtendOn()) {
-            // 2-player mode: prompt for each human/external player
-            if (settings.getPlayerOneType() == PlayerType.HUMAN || settings.getPlayerOneType() == PlayerType.EXTERNAL) {
-                player1Name = promptPlayerName("Player 1");
-                if (player1Name == null) {
-                    return false; // User cancelled
-                }
+            // 2-player mode: prompt for all players
+            String defaultName1 = getDefaultPlayerName(settings.getPlayerOneType(), 1);
+            player1Name = promptPlayerName("Player 1", defaultName1);
+            if (player1Name == null) {
+                return false; // User cancelled
             }
-            
-            if (settings.getPlayerTwoType() == PlayerType.HUMAN || settings.getPlayerTwoType() == PlayerType.EXTERNAL) {
-                player2Name = promptPlayerName("Player 2");
-                if (player2Name == null) {
-                    return false; // User cancelled
-                }
+
+            String defaultName2 = getDefaultPlayerName(settings.getPlayerTwoType(), 2);
+            player2Name = promptPlayerName("Player 2", defaultName2);
+            if (player2Name == null) {
+                return false; // User cancelled
             }
         } else {
-            // Single player mode: only prompt if human/external
-            if (settings.getPlayerOneType() == PlayerType.HUMAN || settings.getPlayerOneType() == PlayerType.EXTERNAL) {
-                player1Name = promptPlayerName("Player");
-                if (player1Name == null) {
-                    return false; // User cancelled
-                }
+            // Single player mode: prompt for player 1
+            String defaultName = getDefaultPlayerName(settings.getPlayerOneType(), 1);
+            player1Name = promptPlayerName("Player", defaultName);
+            if (player1Name == null) {
+                return false; // User cancelled
             }
         }
         return true; // All prompts completed successfully
+    }
+
+    // Get default name based on player type
+    private String getDefaultPlayerName(PlayerType playerType, int playerNumber) {
+        return switch (playerType) {
+            case AI -> "AI Player " + playerNumber;
+            case EXTERNAL -> "External Player " + playerNumber;
+            default -> "Player " + playerNumber;
+        };
     }
 
     // Set player names in the game view
@@ -186,21 +192,21 @@ public class Main extends Application {
     }
 
     // Helper method to prompt for a single player name
-    private String promptPlayerName(String defaultName) {
+    private String promptPlayerName(String playerLabel, String defaultName) {
         TextInputDialog nameDialog = new TextInputDialog(defaultName);
         nameDialog.setTitle("Player Name");
         nameDialog.setHeaderText(null);
-        nameDialog.setContentText("Please enter " + defaultName.toLowerCase() + " name:");
-        
+        nameDialog.setContentText("Please enter " + playerLabel.toLowerCase() + " name:");
+
         // Set minimum width to prevent text truncation
         nameDialog.getDialogPane().setMinWidth(300);
-        
+
         Optional<String> result = nameDialog.showAndWait();
-        
+
         if (!result.isPresent()) {
             return null; // User cancelled
         }
-        
+
         String playerName = result.get().trim();
         return playerName.isEmpty() ? defaultName : playerName;
     }
