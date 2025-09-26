@@ -152,7 +152,7 @@ public class HighScoreService {
         ScoreEntry entry = new ScoreEntry(playerName, scoreToSubmit);
 
         // Perform file operations outside of locks
-        List<ScoreEntry> currentScores = store.load();
+        List<ScoreEntry> currentScores = new ArrayList<>(store.load());
         currentScores.add(entry);
         currentScores.sort((a, b) -> Integer.compare(b.getScore(), a.getScore()));
 

@@ -1,7 +1,5 @@
 package tetris.view;
 
-import java.util.Optional;
-
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
@@ -12,6 +10,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -22,11 +21,16 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import tetris.common.Action;
 import tetris.common.UiGameState;
+import tetris.controller.command.CommandBindings;
+import tetris.controller.command.GameCommand;
 import tetris.controller.event.GameEventHandler;
 import tetris.dto.GameSettingsData;
 import tetris.dto.GameStateData;
 import tetris.dto.TetrominoData;
 import tetris.viewmodel.GameViewModel;
+
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * GameView: Main game view that renders the Tetris game using JavaFX UI components.
@@ -403,11 +407,46 @@ public class GameView {
     // Pure input forwarding to Controller - no business logic in View
     
     private void wireInput(Scene scene) {
+        // choose bindings per mode
+        final Map<KeyCode, GameCommand> p1Map;
+        final Map<KeyCode, GameCommand> p2Map;
+
+        if (isTwoPlayer()) {
+            // assignment's external-mapping requirement
+            p1Map = CommandBindings.player1External();
+            p2Map = CommandBindings.player2External();
+        } else {
+            p1Map = CommandBindings.singlePlayerHuman();
+            p2Map = java.util.Collections.emptyMap();
+        }
+
         scene.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
+            // P1
+            GameCommand cmd = p1Map.get(e.getCode());
+            if (cmd != null) {
+                cmd.execute(p1Handler);
+                renderOnce();
+                e.consume();
+                return;
+            }
+            // P2
             if (isTwoPlayer()) {
-                handleTwoPlayerInput(e);
-            } else {
-                handleSinglePlayerInput(e);
+                cmd = p2Map.get(e.getCode());
+                if (cmd != null) {
+                    cmd.execute(p2Handler);
+                    renderOnce();
+                    e.consume();
+                    return;
+                }
+            }
+            // system keys (common)
+            switch (e.getCode()) {
+                case P -> { forwardPauseToggle(); e.consume(); }
+                case R -> { forwardRestart(); e.consume(); }
+                case M -> { p1Handler.toggleMusic(); renderOnce(); e.consume(); }
+                case S -> { p1Handler.toggleSfx();   renderOnce(); e.consume(); }
+                case ESCAPE -> { askExitToMenu(); e.consume(); }
+                default -> {}
             }
         });
     }
@@ -430,33 +469,7 @@ public class GameView {
             default -> {}
         }
     }
-    
-    private void handleSinglePlayerInput(KeyEvent e) {
-        Action action = switch (e.getCode()) {
-            case LEFT  -> Action.MOVE_LEFT;
-            case RIGHT -> Action.MOVE_RIGHT;
-            case UP    -> Action.ROTATE_CW;
-            case DOWN  -> Action.SOFT_DROP;
-            case SPACE -> Action.HARD_DROP;
-            default -> null;
-        };
 
-        if (action != null) {
-            forwardPlayerAction(p1Handler, action, e);
-            return;
-        }
-
-        switch (e.getCode()) {
-            case P -> forwardPauseToggle();
-            case R -> forwardRestart();
-            case M -> forwardAudioToggle('M');
-            case S -> forwardAudioToggle('S');
-            case ESCAPE -> forwardExitToMenu();
-            default -> {}
-        }
-        e.consume();
-    }
-    
     // Pure input forwarding methods - no business logic
     private void forwardPlayerAction(GameEventHandler handler, Action action, KeyEvent e) {
         if (!handler.isAIActive()) {
