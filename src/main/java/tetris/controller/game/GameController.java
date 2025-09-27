@@ -40,7 +40,7 @@ public class GameController implements IGameController {
         this.scoreController =
                 (scoreControllerOpt != null && scoreControllerOpt.length > 0 && scoreControllerOpt[0] != null)
                         ? scoreControllerOpt[0]
-                        : new ScoreController(new HighScoreService(new HighScoreManager()));
+                        : new ScoreController(new HighScoreService(HighScoreManager.getInstance()));
 
         setPlayerType(playerType);
     }

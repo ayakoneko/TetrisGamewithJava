@@ -24,7 +24,7 @@ public class GameFactory {
     public static GameController createGameController(GameSetting settings,PlayerType type,PieceGenerator shared) {
         GameBoard board = new GameBoard(settings.getFieldWidth(), settings.getFieldHeight(), shared);
         // Each player needs separate score tracking, but should share the high score store
-        ScoreController playerScoreController = new ScoreController(new HighScoreService(new HighScoreManager()));
+        ScoreController playerScoreController = new ScoreController(new HighScoreService(HighScoreManager.getInstance()));
         return new GameController(board, settings, type, new tetris.controller.state.DefaultPlayStateFactory(), playerScoreController);
     }
 
@@ -92,7 +92,7 @@ public class GameFactory {
     // Creates a new ScoreController for scoring management
     public static ScoreController createScoreController() {
         if (sharedScoreController == null) {
-            sharedScoreController = new ScoreController(new HighScoreService(new HighScoreManager()));
+            sharedScoreController = new ScoreController(new HighScoreService(HighScoreManager.getInstance()));
         }
         return sharedScoreController;
     }

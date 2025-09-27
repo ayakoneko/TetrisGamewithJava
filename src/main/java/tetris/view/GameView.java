@@ -1,5 +1,8 @@
 package tetris.view;
 
+import java.util.Map;
+import java.util.Optional;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
@@ -28,9 +31,6 @@ import tetris.dto.GameSettingsData;
 import tetris.dto.GameStateData;
 import tetris.dto.TetrominoData;
 import tetris.viewmodel.GameViewModel;
-
-import java.util.Map;
-import java.util.Optional;
 
 /**
  * GameView: Main game view that renders the Tetris game using JavaFX UI components.
@@ -549,7 +549,7 @@ public class GameView {
 
         // Audio handled by event handler
         p1Handler.startBackgroundMusic();
-
+        
         loop.start();
         renderOnce();
     }

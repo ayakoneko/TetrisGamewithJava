@@ -14,9 +14,14 @@ import java.util.List;
 /**
  * HighScoreManager (I/O only version) – handles loading/saving high scores to JSON.
  * This replaces the old all-in-one version and is used by HighScoreService.
+ * 
+ * Implemented as a Singleton to ensure single instance across the application.
  */
 public class HighScoreManager implements HighScoreStore {
 
+    // Singleton instance
+    private static HighScoreManager instance;
+    
     // JSON file path for persistence
     private static final String HIGHSCORES_FILE = "data/highscores.json";
     // Jackson ObjectMapper for JSON serialization
@@ -25,13 +30,27 @@ public class HighScoreManager implements HighScoreStore {
     private final List<ScoreEntry> scores;
 
     /**
-     * Constructor initializes JSON mapper and loads any existing score data.
+     * Private constructor to prevent external instantiation.
+     * Initializes JSON mapper and loads any existing score data.
      */
-    public HighScoreManager() {
+    private HighScoreManager() {
         this.scores = new ArrayList<>();
         this.objectMapper = new ObjectMapper();
         this.objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // Pretty print JSON
         loadFromFile(); // Load existing scores on startup
+    }
+
+    /**
+     * Returns the singleton instance of HighScoreManager.
+     * Thread-safe lazy initialization using synchronized method.
+     * 
+     * @return the singleton HighScoreManager instance
+     */
+    public static synchronized HighScoreManager getInstance() {
+        if (instance == null) {
+            instance = new HighScoreManager();
+        }
+        return instance;
     }
 
     /**
