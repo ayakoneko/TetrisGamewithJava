@@ -28,8 +28,6 @@ public class HighScoreService {
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private final CompletionService<Boolean> completionService;
 
-    private volatile boolean shutdown = false;
-
     public HighScoreService(HighScoreStore store) {
         this.store = store;
 
@@ -219,7 +217,6 @@ public class HighScoreService {
      * Graceful shutdown of all threads
      */
     public void shutdown() {
-        shutdown = true;
         scoreExecutor.shutdown();
         try {
             if (!scoreExecutor.awaitTermination(5, TimeUnit.SECONDS)) {

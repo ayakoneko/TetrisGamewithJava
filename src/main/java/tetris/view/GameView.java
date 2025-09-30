@@ -22,7 +22,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
-import tetris.common.Action;
 import tetris.common.UiGameState;
 import tetris.controller.command.CommandBindings;
 import tetris.controller.command.GameCommand;
@@ -452,15 +451,6 @@ public class GameView {
     }
     
 
-    // Pure input forwarding methods - no business logic
-    private void forwardPlayerAction(GameEventHandler handler, Action action, KeyEvent e) {
-        if (!handler.isAIActive()) {
-            handler.handlePlayerAction(action);
-            handler.playMoveTurnSound();
-            renderOnce();
-        }
-        e.consume();
-    }
     
     private void forwardPauseToggle() {
         pauseBothPlayers();
@@ -478,17 +468,7 @@ public class GameView {
         renderOnce();
     }
     
-    private void forwardAudioToggle(char key) {
-        switch (key) {
-            case 'M' -> p1Handler.toggleMusic();
-            case 'S' -> p1Handler.toggleSfx();
-        }
-        renderOnce();
-    }
     
-    private void forwardExitToMenu() {
-        askExitToMenu();
-    }
 
     private void renderOnce() {
         renderGameBoard(p1Canvas, p1Handler);
