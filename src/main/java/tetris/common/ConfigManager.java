@@ -1,13 +1,16 @@
 package tetris.common;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import tetris.model.setting.GameSetting;
-
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+import tetris.model.setting.GameSetting;
 
 public final class ConfigManager {
     private static final Path DIR  = Paths.get("data");
@@ -59,6 +62,5 @@ public final class ConfigManager {
         }
     }
 
-    public static void clear() { }
 
 }

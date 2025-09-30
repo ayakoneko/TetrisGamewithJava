@@ -451,24 +451,6 @@ public class GameView {
         });
     }
     
-    private void handleTwoPlayerInput(KeyEvent e) {
-        switch (e.getCode()) {
-            case COMMA -> forwardPlayerAction(p1Handler, Action.MOVE_LEFT, e);
-            case PERIOD -> forwardPlayerAction(p1Handler, Action.MOVE_RIGHT, e);
-            case SPACE -> forwardPlayerAction(p1Handler, Action.SOFT_DROP, e);
-            case L -> forwardPlayerAction(p1Handler, Action.ROTATE_CW, e);
-            case LEFT -> forwardPlayerAction(p2Handler, Action.MOVE_LEFT, e);
-            case RIGHT -> forwardPlayerAction(p2Handler, Action.MOVE_RIGHT, e);
-            case DOWN -> forwardPlayerAction(p2Handler, Action.SOFT_DROP, e);
-            case UP -> forwardPlayerAction(p2Handler, Action.ROTATE_CW, e);
-            case P -> { forwardPauseToggle(); e.consume(); }
-            case R -> { forwardRestart(); e.consume(); }
-            case M -> { forwardAudioToggle('M'); e.consume(); }
-            case S -> { forwardAudioToggle('S'); e.consume(); }
-            case ESCAPE -> { forwardExitToMenu(); e.consume(); }
-            default -> {}
-        }
-    }
 
     // Pure input forwarding methods - no business logic
     private void forwardPlayerAction(GameEventHandler handler, Action action, KeyEvent e) {

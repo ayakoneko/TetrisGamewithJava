@@ -2,14 +2,13 @@ package tetris.model.score;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
+
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -29,9 +28,6 @@ public class HighScoreService {
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private final CompletionService<Boolean> completionService;
 
-    // Thread-safe score submission queue
-    private final BlockingQueue<ScoreSubmissionTask> submissionQueue = new LinkedBlockingQueue<>();
-    private final Thread submissionWorker;
     private volatile boolean shutdown = false;
 
     public HighScoreService(HighScoreStore store) {
@@ -45,10 +41,6 @@ public class HighScoreService {
         });
         this.completionService = new ExecutorCompletionService<>(scoreExecutor);
 
-        // Initialize submission worker thread
-        this.submissionWorker = new Thread(this::processSubmissions, "Score-Submission-Worker");
-        this.submissionWorker.setDaemon(true);
-        this.submissionWorker.start();
 
         // Load initial scores
         loadScoresAsync();
@@ -101,45 +93,7 @@ public class HighScoreService {
         }
     }
 
-    /**
-     * Non-blocking score submission using worker thread
-     */
-    public void submitScoreNonBlocking(String name, ScoreSubmissionCallback callback) {
-        if (shutdown) return;
 
-        ScoreSubmissionTask task = new ScoreSubmissionTask(name, getCurrentScore(), callback);
-        try {
-            boolean offered = submissionQueue.offer(task, 1, TimeUnit.SECONDS);
-            if (!offered && callback != null) {
-                callback.onSubmissionComplete(false, "Submission queue full");
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            if (callback != null) {
-                callback.onSubmissionComplete(false, "Submission interrupted");
-            }
-        }
-    }
-
-    /**
-     * Worker thread method to process score submissions
-     */
-    private void processSubmissions() {
-        while (!shutdown && !Thread.currentThread().isInterrupted()) {
-            try {
-                ScoreSubmissionTask task = submissionQueue.take();
-                boolean success = submitScoreInternal(task.playerName);
-
-                if (task.callback != null) {
-                    task.callback.onSubmissionComplete(success,
-                            success ? "Score submitted successfully" : "Score submission failed");
-                }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                break;
-            }
-        }
-    }
 
     /**
      * Internal score submission logic
@@ -210,11 +164,10 @@ public class HighScoreService {
         }
     }
 
-    /**
-     * Asynchronous refresh from store
-     */
-    public Future<Void> refreshFromStoreAsync() {
-        return scoreExecutor.submit(() -> {
+
+    public void refreshFromStore() {
+        try {
+            // Direct synchronous refresh instead of async
             List<ScoreEntry> fresh = store.load();
             lock.writeLock().lock();
             try {
@@ -225,14 +178,7 @@ public class HighScoreService {
             } finally {
                 lock.writeLock().unlock();
             }
-            return null;
-        });
-    }
-
-    public void refreshFromStore() {
-        try {
-            refreshFromStoreAsync().get(3, TimeUnit.SECONDS);
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+        } catch (Exception e) {
             Thread.currentThread().interrupt();
         }
     }
@@ -253,11 +199,10 @@ public class HighScoreService {
         }
     }
 
-    /**
-     * Asynchronous clear scores
-     */
-    public Future<Void> clearScoresAsync() {
-        return scoreExecutor.submit(() -> {
+
+    public void clearScores() {
+        try {
+            // Direct synchronous clear instead of async
             lock.writeLock().lock();
             try {
                 scores.clear();
@@ -265,14 +210,7 @@ public class HighScoreService {
             } finally {
                 lock.writeLock().unlock();
             }
-            return null;
-        });
-    }
-
-    public void clearScores() {
-        try {
-            clearScoresAsync().get(3, TimeUnit.SECONDS);
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+        } catch (Exception e) {
             Thread.currentThread().interrupt();
         }
     }
@@ -282,7 +220,6 @@ public class HighScoreService {
      */
     public void shutdown() {
         shutdown = true;
-        submissionWorker.interrupt();
         scoreExecutor.shutdown();
         try {
             if (!scoreExecutor.awaitTermination(5, TimeUnit.SECONDS)) {
@@ -297,16 +234,4 @@ public class HighScoreService {
         }
     }
 
-    /**
-     * Inner record for score submission tasks
-     */
-    private record ScoreSubmissionTask(String playerName, int score, ScoreSubmissionCallback callback) {
-    }
-
-    /**
-     * Callback interface for non-blocking score submissions
-     */
-    public interface ScoreSubmissionCallback {
-        void onSubmissionComplete(boolean success, String message);
-    }
 }

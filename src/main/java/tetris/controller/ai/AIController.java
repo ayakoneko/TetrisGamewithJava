@@ -2,9 +2,9 @@ package tetris.controller.ai;
 
 import tetris.common.Action;
 import tetris.controller.game.GameController;
-import tetris.model.tetromino.Tetromino;
 import tetris.model.ai.AIMove;
 import tetris.model.ai.TetrisAI;
+import tetris.model.tetromino.Tetromino;
 
 /**
  * AIController manages AI decision-making and move execution for intelligent Tetris gameplay.
@@ -30,7 +30,6 @@ public class AIController {
     
     // AI execution state tracking
     private boolean isExecuting = false;                // Whether we're currently executing a move
-    private int executionStep = 0;                      // Current step in move execution (unused in current implementation)
     
     /**
      * Plans the next move for the current piece if needed.
@@ -49,7 +48,6 @@ public class AIController {
             // Reset planning and execution state
             needNewMove = false;
             isExecuting = false;
-            executionStep = 0;
         }
     }
     
@@ -70,7 +68,6 @@ public class AIController {
         // Initialize execution state if needed
         if (!isExecuting) {
             isExecuting = true;
-            executionStep = 0;
         }
         
         // Execute moves in optimal sequence for best results:
@@ -108,7 +105,6 @@ public class AIController {
         needNewMove = true;    // Trigger new planning for next piece
         plannedMove = null;    // Clear current plan
         isExecuting = false;   // Reset execution state
-        executionStep = 0;     // Reset execution step counter
     }
     
     /**
@@ -119,7 +115,6 @@ public class AIController {
         needNewMove = true;    // Need to plan for first piece
         plannedMove = null;    // No current plan
         isExecuting = false;   // Not executing anything
-        executionStep = 0;     // Reset step counter
     }
     
     /**
