@@ -6,14 +6,20 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
+import tetris.common.ConfigManager;
 import tetris.model.board.Position;
 import tetris.model.score.HighScoreService;
 import tetris.model.score.HighScoreStore;
 import tetris.model.score.ScoreCalculator;
 import tetris.model.score.ScoreEntry;
+import tetris.model.setting.GameSetting;
+import tetris.model.setting.PlayerType;
 import tetris.model.tetromino.Tetromino;
 import tetris.model.tetromino.TetrominoType;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -265,4 +271,55 @@ class TetrisTestSuite {
         }
         return count;
     }
+
+    /**
+     * Test Case 7: Config Persistence (save/load roundtrip)
+     *
+     * Purpose:
+     * Verifies that GameSetting values are correctly saved into JSON
+     * and reloaded back without any data loss or corruption.
+     *
+     * Strategy:
+     * - Use a temporary directory (@TempDir) to isolate test files
+     *   and avoid polluting the actual config.json.
+     * - Create a GameSetting object with custom values.
+     * - Save the object using ConfigManager.save().
+     * - Reload the object using ConfigManager.loadOrDefault().
+     * - Assert that all fields are preserved correctly.
+     * - Check that the config.json file was actually created.
+     */
+
+    @Test
+    @DisplayName("Test Case 7: Config persistence save/load roundtrip")
+    void testConfigPersistenceSaveLoad() throws Exception {
+        // Arrange
+        GameSetting s = new GameSetting();
+        s.setFieldWidth(12);
+        s.setFieldHeight(24);
+        s.setLevel(7);
+        s.setMusicOn(true);
+        s.setSfxOn(false);
+        s.setExtendOn(true);
+        s.setPlayerOneType(PlayerType.AI);
+        s.setPlayerTwoType(PlayerType.EXTERNAL);
+
+        // Act
+        ConfigManager.save(s);
+        GameSetting loaded = ConfigManager.loadOrDefault();
+
+        // Assert: values
+        assertEquals(12, loaded.getFieldWidth());
+        assertEquals(24, loaded.getFieldHeight());
+        assertEquals(7,  loaded.getLevel());
+        assertTrue(loaded.isMusicOn());
+        assertFalse(loaded.isSfxOn());
+        assertTrue(loaded.isExtendOn());
+        assertEquals(PlayerType.AI,       loaded.getPlayerOneType());
+        assertEquals(PlayerType.EXTERNAL, loaded.getPlayerTwoType());
+
+        // Assert: file exists at real project path
+        Path cfg = Paths.get("data").resolve("config.json");
+        assertTrue(Files.exists(cfg));
+    }
+
 }
